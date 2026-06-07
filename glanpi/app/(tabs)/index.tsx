@@ -1,98 +1,95 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import type { PostType } from '@/api';
+import { ExploreHeader, FeedGrid, toFeedTiles } from '@/components/feed';
+import { GEmptyState, GScreen, GSpinner } from '@/components/ui';
+import { useCity } from '@/hooks/use-city';
+import { useCityFeed } from '@/hooks/use-city-feed';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+/**
+ * Explore tab — the visual, city-scoped feed (PRD §5.1/§5.2). Anonymous-friendly
+ * (the `city_feed` endpoint is public). Renders a Pinterest-style mosaic with
+ * infinite scroll, pull-to-refresh, category filtering and city switching.
+ */
+export default function ExploreScreen() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { city, setCity } = useCity();
+  const [postType, setPostType] = useState<PostType | undefined>(undefined);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCityFeed(city, postType);
+
+  const tiles = useMemo(
+    () => toFeedTiles(data?.pages.flatMap((page) => page.results) ?? []),
+    [data],
+  );
+
+  const header = (
+    <ExploreHeader
+      city={city}
+      onSelectCity={setCity}
+      postType={postType}
+      onChangePostType={setPostType}
+    />
+  );
+
+  // Initial load: spinner under the header (header stays interactive).
+  if (isLoading) {
+    return (
+      <GScreen edges={['top']} padded={false}>
+        {header}
+        <GSpinner centered />
+      </GScreen>
+    );
+  }
+
+  // Hard error fetching the first page.
+  if (isError) {
+    return (
+      <GScreen edges={['top']} padded={false}>
+        {header}
+        <GEmptyState
+          icon="wifi-off"
+          title={t('explore.error.title')}
+          actionLabel={t('explore.error.retry')}
+          onAction={() => refetch()}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+      </GScreen>
+    );
+  }
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <GScreen edges={['top']} padded={false}>
+      {header}
+      <FeedGrid
+        tiles={tiles}
+        onPressTile={(tile) => router.push(`/post/${tile.id}`)}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        isLoadingMore={isFetchingNextPage}
+        refreshing={isRefetching}
+        onRefresh={() => refetch()}
+        ListEmptyComponent={
+          <GEmptyState
+            title={t('explore.empty.title')}
+            description={t('explore.empty.description')}
+          />
+        }
+      />
+    </GScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
