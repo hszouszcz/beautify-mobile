@@ -1,6 +1,8 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * @deprecated Superseded by the Glanpi design system in `@/theme`. Use
+ * `useAppTheme()` and the `G*` component kit (`@/components/ui`) instead. This
+ * file remains only for the leftover Expo-starter screens and will be removed
+ * once those are replaced.
  */
 
 import { Platform } from 'react-native';
