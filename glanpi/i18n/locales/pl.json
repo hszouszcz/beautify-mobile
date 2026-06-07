@@ -1,0 +1,37 @@
+{
+  "translation": {
+    "tabs": {
+      "explore": "Odkrywaj",
+      "find": "Znajdź",
+      "calendar": "Kalendarz",
+      "profile": "Profil"
+    },
+    "explore": {
+      "title": "Odkrywaj",
+      "searchPlaceholder": "Szukaj inspiracji…",
+      "category": {
+        "all": "Wszystko",
+        "hair": "Włosy",
+        "makeup": "Makijaż",
+        "nails": "Paznokcie",
+        "skin": "Skóra"
+      },
+      "empty": {
+        "title": "Wkrótce w Twoim mieście",
+        "description": "Nie ma jeszcze inspiracji dla tego miasta. Spróbuj wybrać inne.",
+        "changeCity": "Zmień miasto"
+      },
+      "error": {
+        "title": "Nie udało się wczytać feedu",
+        "retry": "Spróbuj ponownie"
+      },
+      "footerLoading": "Ładowanie…"
+    },
+    "city": {
+      "pickerTitle": "Wybierz miasto"
+    },
+    "common": {
+      "comingSoon": "Wkrótce dostępne"
+    }
+  }
+}
