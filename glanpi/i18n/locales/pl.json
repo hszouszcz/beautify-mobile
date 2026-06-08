@@ -27,6 +27,21 @@
       },
       "footerLoading": "Ładowanie…"
     },
+    "find": {
+      "searchPlaceholder": "Szukaj salonu lub usługi…",
+      "tab": {
+        "list": "Lista",
+        "map": "Mapa"
+      },
+      "empty": {
+        "title": "Brak salonów w tym mieście",
+        "description": "Nie znaleźliśmy jeszcze salonów dla tego miasta. Spróbuj wybrać inne."
+      },
+      "error": {
+        "title": "Nie udało się wczytać salonów",
+        "retry": "Spróbuj ponownie"
+      }
+    },
     "city": {
       "pickerTitle": "Wybierz miasto"
     },

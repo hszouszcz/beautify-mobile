@@ -11,4 +11,11 @@ export const queryKeys = {
     city: (city: string, postType?: PostType) =>
       ['feed', 'city', city, postType ?? null] as const,
   },
+  salons: {
+    all: () => ['salons'] as const,
+    city: (city: string) => ['salons', 'city', city] as const,
+    // The backend ignores `?salon=`, so services are fetched once and filtered
+    // client-side per card — hence a single shared key, not one per salon.
+    services: () => ['salons', 'services', 'all'] as const,
+  },
 } as const;

@@ -31,9 +31,9 @@ export const MOSAIC_TEMPLATE: readonly { span: number; aspectRatio: number }[] =
  * sized to the tile's aspect ratio) so the grid / infinite scroll can be
  * exercised. Remove this and the call site below once real images are available.
  */
-const USE_MOCK_IMAGES = __DEV__;
+export const USE_MOCK_IMAGES = __DEV__;
 
-function mockImageUrl(seed: string, aspectRatio: number): string {
+export function mockImageUrl(seed: string, aspectRatio: number): string {
   const width = 400;
   const height = Math.round(width / aspectRatio);
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${width}/${height}`;

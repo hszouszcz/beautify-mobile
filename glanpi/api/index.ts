@@ -18,3 +18,4 @@ export {
 } from './endpoints/auth';
 export { getMe, updateMe } from './endpoints/accounts';
 export { getCityFeed, type CityFeedParams } from './endpoints/feed';
+export { getSalons, getAllServices, type SalonsParams } from './endpoints/salons';

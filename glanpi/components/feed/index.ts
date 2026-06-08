@@ -8,5 +8,7 @@ export {
 export {
   toFeedTiles,
   MOSAIC_TEMPLATE,
+  USE_MOCK_IMAGES,
+  mockImageUrl,
   type FeedTileModel,
 } from './to-feed-tiles';
