@@ -25,13 +25,29 @@ export const MOSAIC_TEMPLATE: readonly { span: number; aspectRatio: number }[] =
   { span: 2, aspectRatio: 1.7 }, // full-width hero (landscape)
 ];
 
+/**
+ * DEV ONLY: the API isn't serving real media yet, so swap in deterministic
+ * placeholder photos (picsum.photos, seeded per post → stable across renders,
+ * sized to the tile's aspect ratio) so the grid / infinite scroll can be
+ * exercised. Remove this and the call site below once real images are available.
+ */
+const USE_MOCK_IMAGES = __DEV__;
+
+function mockImageUrl(seed: string, aspectRatio: number): string {
+  const width = 400;
+  const height = Math.round(width / aspectRatio);
+  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${width}/${height}`;
+}
+
 /** Maps API feed posts to mosaic tile view models. Prefers the lighter thumbnail. */
 export function toFeedTiles(posts: FeedPost[]): FeedTileModel[] {
   return posts.map((post, i) => {
     const slot = MOSAIC_TEMPLATE[i % MOSAIC_TEMPLATE.length];
     return {
       id: post.id,
-      imageUrl: post.thumbnail_url ?? post.image_url,
+      imageUrl: USE_MOCK_IMAGES
+        ? mockImageUrl(post.id, slot.aspectRatio)
+        : post.thumbnail_url ?? post.image_url,
       aspectRatio: slot.aspectRatio,
       span: slot.span,
     };
