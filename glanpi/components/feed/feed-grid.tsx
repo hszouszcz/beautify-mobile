@@ -1,5 +1,6 @@
-import { LegendList } from '@legendapp/list/react-native';
+import { AnimatedLegendList } from '@legendapp/list/reanimated';
 import { StyleSheet, View } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { GSpinner } from '@/components/ui';
 import { useAppTheme } from '@/theme';
@@ -17,6 +18,8 @@ export type FeedGridProps = {
   ListEmptyComponent?: React.ComponentType | React.ReactElement | null;
   refreshing?: boolean;
   onRefresh?: () => void;
+  /** When provided, the list writes its scroll offset here on every frame. */
+  sharedScrollOffset?: SharedValue<number>;
 };
 
 /**
@@ -36,11 +39,12 @@ export function FeedGrid({
   ListEmptyComponent,
   refreshing,
   onRefresh,
+  sharedScrollOffset,
 }: FeedGridProps) {
   const { app } = useAppTheme();
 
   return (
-    <LegendList
+    <AnimatedLegendList
       data={tiles}
       keyExtractor={(item) => item.id}
       numColumns={2}
@@ -65,6 +69,7 @@ export function FeedGrid({
       onRefresh={onRefresh}
       contentContainerStyle={{ padding: app.spacing.sm, gap: app.spacing.sm }}
       columnWrapperStyle={{ gap: app.spacing.sm }}
+      sharedValues={sharedScrollOffset != null ? { scrollOffset: sharedScrollOffset } : undefined}
       renderItem={({ item }) => (
         <FeedTile
           uri={item.imageUrl}

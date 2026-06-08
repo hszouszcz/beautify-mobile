@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
 import { Menu } from 'react-native-paper';
 
-import { GChip, GSearchBar, GText } from '@/components/ui';
+import { AppHeader } from '@/components/layout';
+import { GChip, GSearchBar } from '@/components/ui';
 import { CITIES } from '@/constants/cities';
 import { useAppTheme } from '@/theme';
 import type { PostType } from '@/api';
+
+import { ExploreCategoryFilters } from './explore-category-filters';
 
 export type ExploreHeaderProps = {
   city: string;
@@ -16,23 +18,13 @@ export type ExploreHeaderProps = {
   onChangePostType: (postType?: PostType) => void;
 };
 
-type CategoryOption = { value?: PostType; labelKey: string };
-
-const CATEGORY_OPTIONS: CategoryOption[] = [
-  { value: undefined, labelKey: 'explore.category.all' },
-  { value: 'hair', labelKey: 'explore.category.hair' },
-  { value: 'makeup', labelKey: 'explore.category.makeup' },
-  { value: 'nails', labelKey: 'explore.category.nails' },
-  { value: 'skin', labelKey: 'explore.category.skin' },
-];
-
 /**
- * Fixed Explore header: brand title, tappable city selector (anchored Menu),
- * an inspiration search field, and a horizontal category-filter chip row that
- * drives the feed's `post_type`.
+ * Explore-specific header: brand title, tappable city selector, inspiration
+ * search field, and category filters. Composes `AppHeader`; owns only the
+ * city-menu and search-text state.
  *
- * NOTE: full-text search is out of MVP scope (no backend endpoint), so the
- * search field is a visual placeholder and does not yet filter the feed.
+ * NOTE: full-text search is out of MVP scope — the search field is a visual
+ * placeholder and does not yet filter the feed.
  */
 export function ExploreHeader({
   city,
@@ -45,20 +37,10 @@ export function ExploreHeader({
   const [cityMenuOpen, setCityMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const categories = useMemo(
-    () =>
-      CATEGORY_OPTIONS.map((opt) => ({
-        ...opt,
-        label: t(opt.labelKey),
-      })),
-    [t],
-  );
-
   return (
-    <View style={[styles.root, { paddingHorizontal: app.spacing.lg, gap: app.spacing.md }]}>
-      <View style={styles.titleRow}>
-        <GText variant="display">{t('explore.title')}</GText>
-
+    <AppHeader
+      title={t('explore.title')}
+      trailing={
         <Menu
           visible={cityMenuOpen}
           onDismiss={() => setCityMenuOpen(false)}
@@ -83,35 +65,20 @@ export function ExploreHeader({
             />
           ))}
         </Menu>
-      </View>
-
-      <GSearchBar
-        placeholder={t('explore.searchPlaceholder')}
-        value={search}
-        onChangeText={setSearch}
-      />
-
-      <View style={[styles.categories, { gap: app.spacing.sm }]}>
-        {categories.map((opt) => (
-          <GChip
-            key={opt.labelKey}
-            label={opt.label}
-            selected={opt.value === postType}
-            onPress={() => onChangePostType(opt.value)}
-          />
-        ))}
-      </View>
-    </View>
+      }
+      search={
+        <GSearchBar
+          placeholder={t('explore.searchPlaceholder')}
+          value={search}
+          onChangeText={setSearch}
+        />
+      }
+      filters={
+        <ExploreCategoryFilters
+          postType={postType}
+          onChangePostType={onChangePostType}
+        />
+      }
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  root: {},
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  categories: { flexDirection: 'row', flexWrap: 'wrap', paddingVertical: 2 },
-});
