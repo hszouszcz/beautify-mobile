@@ -44,6 +44,10 @@ export default function RootLayout() {
             name="booking"
             options={{ presentation: 'modal', headerShown: false }}
           />
+          <Stack.Screen
+            name="find/filters"
+            options={{ presentation: 'modal', headerShown: false }}
+          />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />

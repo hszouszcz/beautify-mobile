@@ -7,6 +7,8 @@ import { GChip, GSearchBar, GSegmentedControl } from '@/components/ui';
 import { CITIES } from '@/constants/cities';
 import { useAppTheme } from '@/theme';
 
+import { FilterTrigger } from './filter-trigger';
+
 export type FindView = 'list' | 'map';
 
 export type FindHeaderProps = {
@@ -17,6 +19,9 @@ export type FindHeaderProps = {
   onChangeView: (view: FindView) => void;
   city: string;
   onSelectCity: (city: string) => void;
+  /** Active availability-filter count, and the handler that opens the sheet. */
+  filterCount: number;
+  onOpenFilters: () => void;
 };
 
 /**
@@ -32,6 +37,8 @@ export function FindHeader({
   onChangeView,
   city,
   onSelectCity,
+  filterCount,
+  onOpenFilters,
 }: FindHeaderProps) {
   const { t } = useTranslation();
   const { app } = useAppTheme();
@@ -39,7 +46,7 @@ export function FindHeader({
 
   return (
     <View style={[styles.root, { paddingHorizontal: app.spacing.lg, gap: app.spacing.md }]}>
-      <View style={styles.cityRow}>
+      <View style={[styles.cityRow, { gap: app.spacing.sm }]}>
         <Menu
           visible={cityMenuOpen}
           onDismiss={() => setCityMenuOpen(false)}
@@ -64,6 +71,8 @@ export function FindHeader({
             />
           ))}
         </Menu>
+
+        <FilterTrigger count={filterCount} onPress={onOpenFilters} />
       </View>
 
       <GSearchBar

@@ -33,6 +33,25 @@
         "list": "Lista",
         "map": "Mapa"
       },
+      "filters": {
+        "title": "Filtry",
+        "open": "Otwórz filtry",
+        "dateLabel": "Termin",
+        "timeLabel": "Godzina",
+        "anyDate": "Dowolny dzień",
+        "anyTime": "Dowolna pora",
+        "clearTime": "Wyczyść",
+        "today": "Dziś",
+        "timeFrom": "Od",
+        "timeTo": "Do",
+        "partOfDay": {
+          "morning": "Rano",
+          "afternoon": "Popołudnie",
+          "evening": "Wieczór"
+        },
+        "clear": "Wyczyść",
+        "apply": "Pokaż wyniki"
+      },
       "empty": {
         "title": "Brak salonów w tym mieście",
         "description": "Nie znaleźliśmy jeszcze salonów dla tego miasta. Spróbuj wybrać inne."
@@ -141,7 +160,8 @@
       }
     },
     "common": {
-      "comingSoon": "Wkrótce dostępne"
+      "comingSoon": "Wkrótce dostępne",
+      "close": "Zamknij"
     }
   }
 }

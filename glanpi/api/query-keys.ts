@@ -14,6 +14,10 @@ export const queryKeys = {
   salons: {
     all: () => ['salons'] as const,
     city: (city: string) => ['salons', 'city', city] as const,
+    // City list + availability filters (date/time range). Serialized filters are
+    // part of the key so the list refetches when filters change.
+    list: (city: string, filters: Record<string, string | undefined>) =>
+      ['salons', 'city', city, 'filters', filters] as const,
     // The backend ignores `?salon=`, so services are fetched once and filtered
     // client-side per card — hence a single shared key, not one per salon.
     services: () => ['salons', 'services', 'all'] as const,

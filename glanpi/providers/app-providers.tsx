@@ -9,6 +9,7 @@ import i18n from '@/i18n';
 import { glanpiLightTheme } from '@/theme';
 import { AuthProvider } from './auth-provider';
 import { CityProvider } from './city-provider';
+import { FindFiltersProvider } from './find-filters-provider';
 import { PaperIcon } from './paper-icon';
 import { queryClient } from './query-client';
 
@@ -17,7 +18,8 @@ const paperSettings = { icon: PaperIcon };
 /**
  * Single app-wide provider stack (outer → inner):
  * GestureHandlerRootView → SafeAreaProvider → I18nextProvider →
- * QueryClientProvider → AuthProvider → CityProvider → PaperProvider.
+ * QueryClientProvider → AuthProvider → CityProvider → FindFiltersProvider →
+ * PaperProvider.
  *
  * `AuthProvider` sits inside `QueryClientProvider` (it clears the query cache on
  * sign-out) and wraps everything below so `useAuth`/`useMe` are reachable from
@@ -40,9 +42,11 @@ export function AppProviders({
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <CityProvider>
-                <PaperProvider theme={theme} settings={paperSettings}>
-                  {children}
-                </PaperProvider>
+                <FindFiltersProvider>
+                  <PaperProvider theme={theme} settings={paperSettings}>
+                    {children}
+                  </PaperProvider>
+                </FindFiltersProvider>
               </CityProvider>
             </AuthProvider>
           </QueryClientProvider>
