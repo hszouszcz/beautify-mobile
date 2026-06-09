@@ -50,6 +50,11 @@ export function FeedGrid({
       numColumns={2}
       estimatedItemSize={180}
       recycleItems
+      // Required by LegendList whenever the data set changes (infinite-scroll
+      // pages + pull-to-refresh here). Without it, swapping data under
+      // `recycleItems` + a variable-height multi-column layout can leave the
+      // list blank — items "disappear" on reload/refresh.
+      maintainVisibleContentPosition
       overrideItemLayout={(layout, item) => {
         layout.span = item.span;
       }}

@@ -45,6 +45,101 @@
     "city": {
       "pickerTitle": "Wybierz miasto"
     },
+    "post": {
+      "featuredService": "Usługa ze zdjęcia",
+      "book": "Zarezerwuj",
+      "more": "więcej",
+      "less": "mniej",
+      "notFound": "Nie znaleziono tej pracy",
+      "retry": "Spróbuj ponownie"
+    },
+    "salon": {
+      "about": "O salonie",
+      "services": "Usługi",
+      "team": "Zespół",
+      "hours": "Godziny otwarcia",
+      "call": "Zadzwoń",
+      "directions": "Trasa",
+      "book": "Zarezerwuj wizytę",
+      "openNow": "Otwarte teraz · do {{time}}",
+      "closedNow": "Zamknięte",
+      "closedToday": "Zamknięte dziś",
+      "closedShort": "Zamknięte",
+      "noServices": "Ten salon nie dodał jeszcze usług",
+      "error": "Nie udało się wczytać salonu"
+    },
+    "booking": {
+      "next": "Dalej",
+      "specialist": "Specjalista",
+      "recommended": "Polecany",
+      "fromPost": "Ze zdjęcia",
+      "step": {
+        "service": "Wybierz usługę",
+        "schedule": "Wybierz termin",
+        "details": "Twoje dane",
+        "verify": "Potwierdź numer",
+        "review": "Potwierdź rezerwację"
+      },
+      "abandon": {
+        "title": "Porzucić rezerwację?",
+        "message": "Twój tymczasowo zarezerwowany termin zostanie zwolniony.",
+        "confirm": "Porzuć",
+        "cancel": "Wróć"
+      },
+      "slots": {
+        "empty": "Brak wolnych terminów tego dnia",
+        "emptyHint": "Wybierz inny dzień",
+        "error": "Nie udało się wczytać terminów",
+        "retry": "Spróbuj ponownie",
+        "morning": "Rano",
+        "afternoon": "Popołudnie",
+        "evening": "Wieczór"
+      },
+      "details": {
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
+        "phone": "Numer telefonu",
+        "rationale": "Aby potwierdzić rezerwację, podaj swoje dane.",
+        "smsHint": "Wyślemy SMS z kodem na ten numer.",
+        "sendCode": "Wyślij kod",
+        "invalidPhone": "Podaj poprawny numer (9 cyfr)."
+      },
+      "verify": {
+        "title": "Wpisz kod",
+        "sentTo": "Wysłaliśmy 4-cyfrowy kod na {{hint}}",
+        "resend": "Wyślij ponownie",
+        "resendIn": "Wyślij ponownie ({{seconds}}s)",
+        "noCode": "Nie otrzymałeś kodu?",
+        "wrong": "Nieprawidłowy kod",
+        "expired": "Kod wygasł. Wyślij nowy.",
+        "creating": "Tworzymy rezerwację…"
+      },
+      "review": {
+        "bookingAs": "Rezerwujesz jako",
+        "confirm": "Zarezerwuj",
+        "cancelPolicy": "Anulowanie bezpłatne do {{hours}}h przed wizytą."
+      },
+      "hold": {
+        "active": "Termin zarezerwowany {{time}}",
+        "expired": "Czas minął — wybierz termin ponownie"
+      },
+      "confirmation": {
+        "confirmedTitle": "Rezerwacja potwierdzona!",
+        "confirmedBody": "Do zobaczenia {{date}}.",
+        "pendingTitle": "Prośba wysłana",
+        "pendingBody": "Salon potwierdzi wkrótce — damy znać przez powiadomienie.",
+        "addedToCalendar": "Dodaliśmy to do kalendarza.",
+        "done": "Gotowe",
+        "viewInCalendar": "Zobacz w kalendarzu",
+        "with": "z {{name}}"
+      },
+      "error": {
+        "slotTaken": "Ten termin został właśnie zajęty. Wybierz inny.",
+        "limit": "Masz już maksymalną liczbę aktywnych rezerwacji.",
+        "rateLimit": "Zbyt wiele prób. Spróbuj za {{seconds}}s.",
+        "generic": "Coś poszło nie tak. Spróbuj ponownie."
+      }
+    },
     "common": {
       "comingSoon": "Wkrótce dostępne"
     }

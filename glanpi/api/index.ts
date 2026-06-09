@@ -17,5 +17,26 @@ export {
   refreshToken,
 } from './endpoints/auth';
 export { getMe, updateMe } from './endpoints/accounts';
-export { getCityFeed, type CityFeedParams } from './endpoints/feed';
-export { getSalons, getAllServices, type SalonsParams } from './endpoints/salons';
+export {
+  getCityFeed,
+  getPost,
+  getPostBooking,
+  type CityFeedParams,
+} from './endpoints/feed';
+export {
+  getSalons,
+  getAllServices,
+  getSalon,
+  getStaff,
+  getBusinessHours,
+  type SalonsParams,
+} from './endpoints/salons';
+export {
+  getAvailability,
+  createSlotHold,
+  createBooking,
+  createAnonymousBooking,
+  getMyBookings,
+  cancelAnonymousBooking,
+  type AvailabilityParams,
+} from './endpoints/bookings';

@@ -7,7 +7,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { PostType } from '@/api';
 import { AppHeader, useCollapsingHeader } from '@/components/layout';
-import { ExploreCategoryFilters, ExploreHeader, FeedGrid, toFeedTiles } from '@/components/feed';
+import {
+  ExploreCategoryFilters,
+  ExploreHeader,
+  FeedGrid,
+  toFeedTiles,
+  useChipScrollSync,
+} from '@/components/feed';
 import { GEmptyState, GScreen, GSpinner } from '@/components/ui';
 import { useCity } from '@/hooks/use-city';
 import { useCityFeed } from '@/hooks/use-city-feed';
@@ -31,6 +37,9 @@ export default function ExploreScreen() {
   const [postType, setPostType] = useState<PostType | undefined>(undefined);
   const insets = useSafeAreaInsets();
   const { scrollOffset, compactBarStyle } = useCollapsingHeader();
+  // Shared so the chip row reads identically in the expanded header and the
+  // compact scroll overlay (both render their own ExploreCategoryFilters).
+  const categoryScrollSync = useChipScrollSync();
 
   const {
     data,
@@ -54,6 +63,7 @@ export default function ExploreScreen() {
       onSelectCity={setCity}
       postType={postType}
       onChangePostType={setPostType}
+      categoryScrollSync={categoryScrollSync}
     />
   );
 
@@ -72,6 +82,7 @@ export default function ExploreScreen() {
             <ExploreCategoryFilters
               postType={postType}
               onChangePostType={setPostType}
+              sync={categoryScrollSync}
             />
           }
           style={{

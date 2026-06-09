@@ -38,7 +38,12 @@ export default function RootLayout() {
       <ThemeProvider value={navTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="post/[id]" options={{ title: '' }} />
+          <Stack.Screen name="post/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="salon/[id]" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="booking"
+            options={{ presentation: 'modal', headerShown: false }}
+          />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />

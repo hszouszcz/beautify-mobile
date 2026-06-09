@@ -17,5 +17,21 @@ export const queryKeys = {
     // The backend ignores `?salon=`, so services are fetched once and filtered
     // client-side per card — hence a single shared key, not one per salon.
     services: () => ['salons', 'services', 'all'] as const,
+    detail: (id: number | string) => ['salons', 'detail', id] as const,
+    staff: (id: number | string) => ['salons', 'staff', id] as const,
+    hours: (id: number | string) => ['salons', 'hours', id] as const,
+  },
+  posts: {
+    detail: (id: string) => ['posts', 'detail', id] as const,
+    booking: (id: string) => ['posts', 'booking', id] as const,
+  },
+  bookings: {
+    mine: () => ['bookings', 'mine'] as const,
+    availability: (
+      salon: number | string,
+      service: number | string,
+      staff: number | string,
+      date: string,
+    ) => ['bookings', 'availability', salon, service, staff, date] as const,
   },
 } as const;

@@ -39,9 +39,21 @@ export function mockImageUrl(seed: string, aspectRatio: number): string {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${width}/${height}`;
 }
 
-/** Maps API feed posts to mosaic tile view models. Prefers the lighter thumbnail. */
+/**
+ * Maps API feed posts to mosaic tile view models. Prefers the lighter thumbnail.
+ * De-duplicates by `id` first: page-number pagination can return the same post
+ * across pages when the backend list shifts, and duplicate ids become duplicate
+ * list keys — which makes LegendList drop/collapse cells (content "disappears").
+ */
 export function toFeedTiles(posts: FeedPost[]): FeedTileModel[] {
-  return posts.map((post, i) => {
+  const seen = new Set<string>();
+  const unique = posts.filter((post) => {
+    if (seen.has(post.id)) return false;
+    seen.add(post.id);
+    return true;
+  });
+
+  return unique.map((post, i) => {
     const slot = MOSAIC_TEMPLATE[i % MOSAIC_TEMPLATE.length];
     return {
       id: post.id,

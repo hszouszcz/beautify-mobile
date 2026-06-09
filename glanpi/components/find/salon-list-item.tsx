@@ -4,18 +4,12 @@ import type { Salon } from '@/api';
 import { SalonCard, type SalonCardService } from '@/components/salon';
 import { useSalonServices } from '@/hooks/use-salon-services';
 import { useSalonThumbnails } from '@/hooks/use-salon-thumbnails';
+import { formatPrice } from '@/lib/format';
 
 export type SalonListItemProps = {
   salon: Salon;
   onPress: (salon: Salon) => void;
 };
-
-/** "180.00" → "180 zł"; null/non-numeric passes through (or is dropped). */
-function formatPrice(priceDisplay: string | null): string | null {
-  if (!priceDisplay) return null;
-  const value = Number(priceDisplay);
-  return Number.isFinite(value) ? `${Math.round(value)} zł` : priceDisplay;
-}
 
 /**
  * One Find-list card. The salon list endpoint carries no services/images, so we

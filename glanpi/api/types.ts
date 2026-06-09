@@ -91,6 +91,131 @@ export interface SalonService {
   price_display: string | null;
 }
 
+// --- Staff & business hours (Salon Detail + booking) ---
+
+/**
+ * A salon staff member. `GET /salons/staff/?salon=` may ignore its filter (like
+ * `/services/`), so callers filter by `salon` client-side. Id types are mixed
+ * int/uuid across the dev backend — keep loose and pass through verbatim
+ * (plan §3.1 ID-type note).
+ */
+export interface Staff {
+  id: number | string;
+  salon: number | string;
+  display_name: string;
+  services?: (number | string)[];
+  is_active: boolean;
+}
+
+export interface BusinessHours {
+  id: number | string;
+  salon: number | string;
+  day_of_week: number; // 0=Mon … 6=Sun
+  day_name: string;
+  open_time: string | null; // "09:00:00"
+  close_time: string | null;
+  is_closed: boolean;
+}
+
+// --- Tap-to-book payload: GET /feed/posts/{id}/salon_booking/ ---
+
+export interface PostBookingSalon {
+  id: number | string;
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  email: string | null;
+  timezone: string;
+}
+
+/** A service as returned inside `salon_booking` — `services[]` here lack price (G3). */
+export interface BookingServiceLite {
+  id: number | string;
+  name: string;
+  description?: string;
+  duration_minutes: number;
+  price_display?: string | null; // present only on `featured_service`
+}
+
+export interface PostBooking {
+  salon: PostBookingSalon;
+  recommended_staff: { id: number | string; name: string; bio?: string } | null;
+  services: BookingServiceLite[];
+  staff_members: { id: number | string; display_name: string }[];
+  featured_service: BookingServiceLite | null;
+  ui_hints?: {
+    post_type: PostType;
+    has_featured_service: boolean;
+    booking_message?: string;
+  };
+}
+
+// --- Availability: GET /bookings/availability/ ---
+
+export interface SlotOption {
+  slot_ids: (number | string)[];
+  start_datetime: string; // ISO 8601 UTC
+  end_datetime: string;
+  display: { start_time: string; end_time: string }; // salon-local "09:00:00"
+}
+
+export interface AvailabilityResponse {
+  salon: string;
+  service: string;
+  staff: string;
+  date: string;
+  slot_options: SlotOption[];
+  total_options: number;
+}
+
+// --- Slot holds (5-min TTL) ---
+
+export interface SlotHold {
+  hold_id: string;
+  expires_at: string; // ISO 8601 UTC
+}
+
+// --- Bookings ---
+
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+
+/** Embedded salon/service/staff objects vary by endpoint — kept intentionally loose. */
+export interface Booking {
+  id: number | string;
+  salon: { id: number | string; name: string; address?: string; timezone?: string };
+  service: {
+    id: number | string;
+    name: string;
+    duration_minutes?: number;
+    price_display?: string | null;
+  };
+  staff: { id: number | string; display_name?: string; name?: string } | null;
+  start_time: string; // ISO UTC
+  end_time: string;
+  status: BookingStatus;
+  customer_name?: string;
+  created_at: string;
+}
+
+export interface CreateBookingRequest {
+  salon: number | string;
+  service: number | string;
+  staff: number | string;
+  start_time: string; // = SlotOption.start_datetime
+}
+
+export interface CreateAnonymousBookingRequest extends CreateBookingRequest {
+  customer_name: string;
+  customer_email?: string;
+  customer_phone: string;
+}
+
+export interface CreateBookingResponse {
+  booking: Booking;
+  booking_token?: string;
+}
+
 // --- Auth request/response shapes ---
 
 export interface InitiatePhoneAuthRequest {

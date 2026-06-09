@@ -1,5 +1,5 @@
 import { apiClient } from '../client';
-import type { CityFeedResponse, PostType } from '../types';
+import type { CityFeedResponse, FeedPost, PostBooking, PostType } from '../types';
 
 /**
  * Feed endpoints. PUBLIC — work without auth (anonymous browsing is core to the
@@ -22,5 +22,17 @@ export async function getCityFeed({
   const { data } = await apiClient.get<CityFeedResponse>('/feed/posts/city_feed/', {
     params: { city, post_type: postType, page },
   });
+  return data;
+}
+
+/** Full post detail (PUBLIC). The GET also tracks the view server-side. */
+export async function getPost(id: string): Promise<FeedPost> {
+  const { data } = await apiClient.get<FeedPost>(`/feed/posts/${id}/`);
+  return data;
+}
+
+/** Tap-to-book payload: salon + services + staff + featured service (PUBLIC). */
+export async function getPostBooking(id: string): Promise<PostBooking> {
+  const { data } = await apiClient.get<PostBooking>(`/feed/posts/${id}/salon_booking/`);
   return data;
 }

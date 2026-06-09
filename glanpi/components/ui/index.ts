@@ -21,3 +21,7 @@ export { GAvatar, type GAvatarProps } from './g-avatar';
 export { GDivider, type GDividerProps } from './g-divider';
 export { GSpinner, type GSpinnerProps } from './g-spinner';
 export { GEmptyState, type GEmptyStateProps } from './g-empty-state';
+export { GTextField, type GTextFieldProps } from './g-text-field';
+export { GOtpInput, type GOtpInputProps } from './g-otp-input';
+export { GBottomBar, type GBottomBarProps } from './g-bottom-bar';
+export { GStepProgress, type GStepProgressProps } from './g-step-progress';

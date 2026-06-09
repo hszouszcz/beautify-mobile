@@ -8,7 +8,7 @@ import { CITIES } from '@/constants/cities';
 import { useAppTheme } from '@/theme';
 import type { PostType } from '@/api';
 
-import { ExploreCategoryFilters } from './explore-category-filters';
+import { ExploreCategoryFilters, type ChipScrollSync } from './explore-category-filters';
 
 export type ExploreHeaderProps = {
   city: string;
@@ -16,6 +16,8 @@ export type ExploreHeaderProps = {
   /** Active category filter (`post_type`); `undefined` = all categories. */
   postType?: PostType;
   onChangePostType: (postType?: PostType) => void;
+  /** Shared chip-scroll state so the filter row aligns with the compact overlay. */
+  categoryScrollSync?: ChipScrollSync;
 };
 
 /**
@@ -31,6 +33,7 @@ export function ExploreHeader({
   onSelectCity,
   postType,
   onChangePostType,
+  categoryScrollSync,
 }: ExploreHeaderProps) {
   const { t } = useTranslation();
   const { app } = useAppTheme();
@@ -77,6 +80,7 @@ export function ExploreHeader({
         <ExploreCategoryFilters
           postType={postType}
           onChangePostType={onChangePostType}
+          sync={categoryScrollSync}
         />
       }
     />

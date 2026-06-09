@@ -1,5 +1,16 @@
 import { apiClient } from '../client';
-import type { Paginated, Salon, SalonService } from '../types';
+import type {
+  BusinessHours,
+  Paginated,
+  Salon,
+  SalonService,
+  Staff,
+} from '../types';
+
+/** Unwrap a DRF page envelope or tolerate a bare array. */
+function unwrap<T>(data: T[] | Paginated<T>): T[] {
+  return Array.isArray(data) ? data : data.results;
+}
 
 /**
  * Salon browsing endpoints (Find tab). PUBLIC — anonymous browsing is core to
@@ -42,5 +53,33 @@ export async function getAllServices(): Promise<SalonService[]> {
   const { data } = await apiClient.get<SalonService[] | Paginated<SalonService>>(
     '/salons/services/',
   );
-  return Array.isArray(data) ? data : data.results;
+  return unwrap(data);
+}
+
+/** Single salon identity. PUBLIC. `GET /salons/salons/{id}/`. */
+export async function getSalon(id: number | string): Promise<Salon> {
+  const { data } = await apiClient.get<Salon>(`/salons/salons/${id}/`);
+  return data;
+}
+
+/**
+ * Staff for one salon. The `?salon=` filter may be ignored by the backend (like
+ * `/services/`), so we send it as a hint and also filter client-side to be safe.
+ */
+export async function getStaff(salonId: number | string): Promise<Staff[]> {
+  const { data } = await apiClient.get<Staff[] | Paginated<Staff>>('/salons/staff/', {
+    params: { salon: salonId },
+  });
+  return unwrap(data).filter((s) => String(s.salon) === String(salonId));
+}
+
+/** Business hours for one salon. Same `?salon=` tolerance as staff/services. */
+export async function getBusinessHours(
+  salonId: number | string,
+): Promise<BusinessHours[]> {
+  const { data } = await apiClient.get<BusinessHours[] | Paginated<BusinessHours>>(
+    '/salons/business-hours/',
+    { params: { salon: salonId } },
+  );
+  return unwrap(data).filter((h) => String(h.salon) === String(salonId));
 }
