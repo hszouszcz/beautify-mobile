@@ -2,30 +2,38 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Salon } from '@/api';
-import { FindHeader, SalonList, SalonMap, type FindView } from '@/components/find';
+import { FilterButton, FindHeader, FindViewToggle, SalonList, SalonMap, type FindView } from '@/components/find';
+import { AppHeader, useCollapsingHeader } from '@/components/layout';
 import { GEmptyState, GScreen, GSpinner } from '@/components/ui';
-import { useAllServices } from '@/hooks/use-all-services';
 import { useCity } from '@/hooks/use-city';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useSalons } from '@/hooks/use-salons';
 import { useFindFilters } from '@/providers/find-filters-provider';
+import { useAppTheme } from '@/theme';
 
 /**
  * Find tab — filtered salon browsing by city (PRD §5.1), with a List ↔ Map
  * toggle. The salon list (`useSalons`) is the primary source; each list card is
- * lazily enriched with services + work thumbnails. The search field filters the
- * already-loaded salons client-side by salon name, address, city, and the names
- * of services each salon offers (joined against `useAllServices`, since the
- * salon list carries no services). Backend full-text search is post-MVP.
+ * lazily enriched with services + work thumbnails. The search box drives the
+ * server-side `q` filter (matches salon name, address, and active service names,
+ * across all pages), debounced so each keystroke doesn't refetch. The result
+ * `count` from the page envelope is surfaced as a "X salons found" header label.
  */
 export default function FindScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { app } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const { city, setCity } = useCity();
-  const { filters, activeCount } = useFindFilters();
+  const { filters, clear } = useFindFilters();
   const [view, setView] = useState<FindView>('list');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const { scrollOffset, compactBarStyle } = useCollapsingHeader({ collapseThreshold: 120 });
 
   const {
     data,
@@ -36,60 +44,67 @@ export default function FindScreen() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useSalons(city, filters);
-
-  const { data: services } = useAllServices();
+  } = useSalons(city, filters, debouncedSearch);
 
   const salons = useMemo(
     () => data?.pages.flatMap((page) => page.results) ?? [],
     [data],
   );
 
-  // Salon id → lowercased service names, so a query can match a salon by the
-  // services it offers (the salon list itself carries no services).
-  const serviceNamesBySalon = useMemo(() => {
-    const map = new Map<number, string[]>();
-    for (const s of services ?? []) {
-      const names = map.get(s.salon) ?? [];
-      names.push(s.name.toLowerCase());
-      map.set(s.salon, names);
-    }
-    return map;
-  }, [services]);
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return salons;
-    return salons.filter((s) => {
-      if (
-        s.name.toLowerCase().includes(q) ||
-        s.address.toLowerCase().includes(q) ||
-        s.city.toLowerCase().includes(q)
-      ) {
-        return true;
-      }
-      return (serviceNamesBySalon.get(s.id) ?? []).some((name) => name.includes(q));
-    });
-  }, [salons, search, serviceNamesBySalon]);
+  // The envelope's `count` is the full filtered total (all pages), not just the
+  // rows loaded so far — the right number for "X salons found".
+  const resultCount = data?.pages[0]?.count;
 
   const goToSalon = (salon: Salon) => router.push(`/salon/${salon.id}`);
 
-  const header = (
-    <FindHeader
-      search={search}
-      onChangeSearch={setSearch}
-      view={view}
-      onChangeView={setView}
-      city={city}
-      onSelectCity={setCity}
-      filterCount={activeCount}
-      onOpenFilters={() => router.push('/find/filters')}
-    />
+  const headerProps = {
+    search,
+    onChangeSearch: setSearch,
+    city,
+    onSelectCity: setCity,
+    filters,
+    resultCount: isLoading ? undefined : resultCount,
+    onOpenFilters: () => router.push('/find/filters'),
+    onClearFilters: clear,
+  };
+
+  // Compact sticky overlay — fades in as the user scrolls past the expanded header.
+  // Uses AppHeader directly (no trailing slot) so the title stays centred, matching
+  // the Explore compact bar exactly.
+  const compactBar = (
+    <View style={styles.compactBarOuter} pointerEvents="box-none">
+      <Animated.View style={compactBarStyle}>
+        <AppHeader
+          compact
+          title={t('find.title')}
+          filters={
+            <View style={styles.filterRow}>
+              <FilterButton
+                filters={filters}
+                onPress={() => router.push('/find/filters')}
+                onClear={clear}
+              />
+            </View>
+          }
+          style={{
+            paddingTop: insets.top + app.spacing.sm,
+            backgroundColor: app.colors.backgroundStrong,
+            ...app.elevation.card,
+          }}
+        />
+      </Animated.View>
+    </View>
   );
+
+  const expandedHeader = <FindHeader {...headerProps} />;
 
   // Empty / loading / error are handled at the screen level (not via the list's
   // ListEmptyComponent, which collapses to zero height when data is empty).
-  const isEmpty = filtered.length === 0;
+  const isEmpty = salons.length === 0;
+
+  // In list view, the expanded header scrolls with the list as ListHeaderComponent
+  // so the compact bar can fade in over it. In all other states the header is fixed.
+  const isListView = !isLoading && !isError && !isEmpty && view === 'list';
 
   let content: React.ReactNode;
   if (isLoading) {
@@ -113,12 +128,14 @@ export default function FindScreen() {
       />
     );
   } else if (view === 'map') {
-    content = <SalonMap salons={filtered} city={city} onPressSalon={goToSalon} />;
+    content = <SalonMap salons={salons} city={city} onPressSalon={goToSalon} />;
   } else {
     content = (
       <SalonList
-        salons={filtered}
+        salons={salons}
         onPressSalon={goToSalon}
+        ListHeaderComponent={<View style={styles.header}>{expandedHeader}</View>}
+        sharedScrollOffset={scrollOffset}
         onEndReached={() => {
           if (hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
@@ -127,14 +144,25 @@ export default function FindScreen() {
         isLoadingMore={isFetchingNextPage}
         refreshing={isRefetching}
         onRefresh={() => refetch()}
+        contentBottomInset={app.spacing.xl + 44}
       />
     );
   }
 
+  // The floating List ↔ Map pill only makes sense when there are results to
+  // toggle between — hidden during loading / error / empty states.
+  const showViewToggle = !isLoading && !isError && !isEmpty;
+
   return (
     <GScreen edges={['top']} padded={false}>
-      <View style={styles.header}>{header}</View>
-      <View style={styles.content}>{content}</View>
+      {compactBar}
+      {!isListView && <View style={styles.header}>{expandedHeader}</View>}
+      <View style={styles.content}>
+        {content}
+        {showViewToggle && (
+          <FindViewToggle view={view} onChange={setView} bottomInset={app.spacing.lg} />
+        )}
+      </View>
     </GScreen>
   );
 }
@@ -142,4 +170,14 @@ export default function FindScreen() {
 const styles = StyleSheet.create({
   header: { paddingVertical: 8 },
   content: { flex: 1 },
+  compactBarOuter: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  // Row wrapper so the chip keeps its intrinsic width — AppHeader's column
+  // layout would otherwise stretch it full-width.
+  filterRow: { flexDirection: 'row' },
 });

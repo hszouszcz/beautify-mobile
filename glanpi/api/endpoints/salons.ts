@@ -26,34 +26,56 @@ function unwrap<T>(data: T[] | Paginated<T>): T[] {
 export interface SalonsParams {
   city: string;
   page?: number;
+  pageSize?: number; // default 20, max 50
   /**
-   * Availability filters (date/time range). Sent as snake_case query params per
-   * the backend spec (`docs/find-filters-backend-spec.md`). Until that endpoint
-   * ships the backend ignores unknown params, so these are inert but harmless.
+   * Free-text search. Server-side, across all pages: matches salon name,
+   * address, and **active service names** (the salon list carries no services,
+   * so this can't be done client-side). See `MOBILE_FIND_FILTERS.md`.
+   */
+  q?: string;
+  /**
+   * Availability filters (date/time range), sent as snake_case query params.
+   * Times are wall-clock in each salon's own timezone — never converted
+   * client-side. A salon matches if it has at least one free slot in the window
+   * (a discovery filter, not a booking guarantee).
    */
   availableFromDate?: string; // YYYY-MM-DD
   availableToDate?: string; // YYYY-MM-DD
   availableFromTime?: string; // HH:mm
   availableToTime?: string; // HH:mm
+  /** Geo radius filter. All three required together; results sorted nearest-first. */
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
 }
 
 /** City-scoped salon list. Tolerates both a DRF page envelope and a bare array. */
 export async function getSalons({
   city,
   page = 1,
+  pageSize,
+  q,
   availableFromDate,
   availableToDate,
   availableFromTime,
   availableToTime,
+  lat,
+  lng,
+  radiusKm,
 }: SalonsParams): Promise<Paginated<Salon>> {
   const { data } = await apiClient.get<Salon[] | Paginated<Salon>>('/salons/salons/', {
     params: {
       city,
       page,
+      page_size: pageSize,
+      q,
       available_from_date: availableFromDate,
       available_to_date: availableToDate,
       available_from_time: availableFromTime,
       available_to_time: availableToTime,
+      lat,
+      lng,
+      radius_km: radiusKm,
     },
   });
   // Tolerate a non-paginated (bare array) response so `results` is never

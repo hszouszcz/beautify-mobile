@@ -313,9 +313,22 @@
 
 **Authentication:** Optional (JWT Bearer for owners)
 
-**Query Parameters:**
+**Query Parameters (all optional, combined with AND):**
+- `city` (string): Filter by city (case-insensitive exact match)
+- `available_from_date` (date, YYYY-MM-DD): First day of the availability window (salon-local)
+- `available_to_date` (date, YYYY-MM-DD): Last day, inclusive; defaults to `from_date` (single day)
+- `available_from_time` (time, HH:mm): Earliest wall-clock slot start in the **salon's timezone**
+- `available_to_time` (time, HH:mm): Latest wall-clock slot start in the salon's timezone
+- `q` (string): Case-insensitive search over salon name, address, and active service names
+- `lat` / `lng` / `radius_km` (float): Distance filter (all three required together); sorted nearest-first
 - `page` (int): Page number for pagination (default: 1)
-- `page_size` (int): Items per page (default: varies)
+- `page_size` (int): Items per page (default: 20, max: 50)
+
+**Availability semantics:** a salon matches if it has at least one free slot in the
+window. `date` only → any time those days; `time` only → that window over the next 30
+days; both → time window per day. Times are local wall-clock in each salon's timezone.
+Invalid ranges (`to_date < from_date`, `to_time <= from_time`) or partial geo params
+return `400`. This is a discovery filter, not a booking guarantee.
 
 **Response (200 OK):**
 ```json

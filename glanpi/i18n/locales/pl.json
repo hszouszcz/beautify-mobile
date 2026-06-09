@@ -28,7 +28,12 @@
       "footerLoading": "Ładowanie…"
     },
     "find": {
+      "title": "Znajdź",
       "searchPlaceholder": "Szukaj salonu lub usługi…",
+      "resultCount_one": "Znaleziono {{count}} salon",
+      "resultCount_few": "Znaleziono {{count}} salony",
+      "resultCount_many": "Znaleziono {{count}} salonów",
+      "resultCount_other": "Znaleziono {{count}} salonów",
       "tab": {
         "list": "Lista",
         "map": "Mapa"

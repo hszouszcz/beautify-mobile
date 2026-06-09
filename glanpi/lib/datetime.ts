@@ -109,6 +109,38 @@ export function formatShortDate(isoDate: string): string {
     .replace(/\./g, '');
 }
 
+/** YYYY-MM-DD → "12 cze" (compact day + short month, for filter chips). */
+export function formatDayMonthShort(isoDate: string): string {
+  const anchor = new Date(`${isoDate}T12:00:00Z`);
+  return new Intl.DateTimeFormat('pl-PL', {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  })
+    .format(anchor)
+    .replace(/\./g, '');
+}
+
+/**
+ * Compact label for a date range on the Find "Kiedy" chip. Collapses to a single
+ * date when `to` is missing or equal to `from`; drops the repeated month when
+ * both ends share one ("12–16 cze"), otherwise spells both ("28 cze – 3 lip").
+ */
+export function formatDateRangeShort(from: string, to?: string): string {
+  if (!to || to === from) return formatDayMonthShort(from);
+  if (from.slice(0, 7) === to.slice(0, 7)) {
+    const dayFrom = Number(from.slice(8, 10));
+    return `${dayFrom}–${formatDayMonthShort(to)}`;
+  }
+  return `${formatDayMonthShort(from)} – ${formatDayMonthShort(to)}`;
+}
+
+/** "09:00" → "9", "14:30" → "14:30" — drops the leading zero and a :00 suffix for chips. */
+export function compactClock(hhmm: string): string {
+  const [h, m] = hhmm.split(':');
+  return m === '00' ? String(Number(h)) : `${Number(h)}:${m}`;
+}
+
 /** YYYY-MM-DD → "12 czerwca" (Confirmation copy). */
 export function formatLongDate(isoDate: string): string {
   const anchor = new Date(`${isoDate}T12:00:00Z`);

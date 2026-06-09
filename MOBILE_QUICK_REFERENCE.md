@@ -87,6 +87,16 @@ GET /feed/posts/{id}/salon_booking/
     }
 ```
 
+### Browse / Search Salons (Find tab)
+```
+GET /salons/salons/?city=Warsaw&available_from_date=2026-06-12
+        &available_to_date=2026-06-15&available_from_time=09:00&available_to_time=13:00
+        &q=balayage&lat=52.23&lng=21.01&radius_km=5&page=1
+  ← {count, next, previous, results: [Salon, ...]}   # paginated envelope
+```
+All filter params optional (AND-combined). Times are wall-clock in each salon's
+timezone. Read salons from `results`. Full contract → `MOBILE_FIND_FILTERS.md`.
+
 ### Browse Salon Details
 ```
 GET /salons/salons/{id}/

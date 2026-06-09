@@ -20,6 +20,9 @@ export function GChip({ label, selected = false, style, ...rest }: GChipProps) {
       selected={selected}
       showSelectedOverlay={false}
       showSelectedCheck={false}
+      // Drives leading + close icon color; only override when selected so the
+      // icons read `onAccent` on the brown fill (unselected falls back to theme).
+      selectedColor={selected ? app.colors.onAccent : undefined}
       style={[
         styles.chip,
         {

@@ -1,5 +1,6 @@
-import { LegendList } from '@legendapp/list/react-native';
+import { AnimatedLegendList } from '@legendapp/list/reanimated';
 import { StyleSheet, View } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 import type { Salon } from '@/api';
 import { GSpinner } from '@/components/ui';
@@ -16,6 +17,10 @@ export type SalonListProps = {
   ListEmptyComponent?: React.ComponentType | React.ReactElement | null;
   refreshing?: boolean;
   onRefresh?: () => void;
+  /** Extra bottom padding so a floating overlay (view toggle) can't cover the last row. */
+  contentBottomInset?: number;
+  /** When provided, the list writes its scroll offset here on every frame. */
+  sharedScrollOffset?: SharedValue<number>;
 };
 
 /**
@@ -33,11 +38,13 @@ export function SalonList({
   ListEmptyComponent,
   refreshing,
   onRefresh,
+  contentBottomInset = 0,
+  sharedScrollOffset,
 }: SalonListProps) {
   const { app } = useAppTheme();
 
   return (
-    <LegendList
+    <AnimatedLegendList
       data={salons}
       keyExtractor={(item) => String(item.id)}
       estimatedItemSize={260}
@@ -58,9 +65,11 @@ export function SalonList({
       onRefresh={onRefresh}
       contentContainerStyle={{
         paddingHorizontal: app.spacing.lg,
-        paddingVertical: app.spacing.sm,
+        paddingTop: app.spacing.sm,
+        paddingBottom: app.spacing.sm + contentBottomInset,
         gap: app.spacing.md,
       }}
+      sharedValues={sharedScrollOffset != null ? { scrollOffset: sharedScrollOffset } : undefined}
       renderItem={({ item }) => <SalonListItem salon={item} onPress={onPressSalon} />}
     />
   );
