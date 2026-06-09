@@ -49,11 +49,21 @@ export interface FeedPost {
   published_at: string;
 }
 
-/** `city_feed` extends the page envelope with the echoed query context. */
-export interface CityFeedResponse extends Paginated<FeedPost> {
+/**
+ * `city_feed` response. This endpoint does NOT use DRF pagination — when the
+ * city has posts it returns a flat, custom shape with the (server-capped) result
+ * set inline and no `count/next/previous`. `next` is therefore absent today; it
+ * is kept optional so the infinite-query stop condition stays robust if the
+ * backend adds paging later. (When a city has no salons the endpoint instead
+ * returns a DRF-wrapped envelope nesting this object under `results` —
+ * `getCityFeed` normalizes that back to this flat shape.)
+ */
+export interface CityFeedResponse {
   city: string;
   post_type: PostType | null;
   total_posts: number;
+  results: FeedPost[];
+  next?: string | null;
 }
 
 // --- Salon browsing (Find tab) ---
@@ -148,6 +158,11 @@ export interface PostBooking {
     post_type: PostType;
     has_featured_service: boolean;
     booking_message?: string;
+    /**
+     * Services the post suggests when there's no explicit `featured_service`.
+     * The first entry is the preselect fallback for the booking flow.
+     */
+    recommended_services?: BookingServiceLite[];
   };
 }
 

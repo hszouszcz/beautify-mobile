@@ -51,6 +51,9 @@ export function TimeSlotGrid({
     <LegendList
       data={data}
       keyExtractor={(item) => item.start_datetime}
+      // `selected` depends on `selectedKey` (outside `item`); without extraData
+      // LegendList memoizes the pills and the highlight won't move on tap.
+      extraData={selectedKey}
       numColumns={3}
       estimatedItemSize={44}
       showsVerticalScrollIndicator={false}

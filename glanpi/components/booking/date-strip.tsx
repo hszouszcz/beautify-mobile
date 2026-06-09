@@ -27,6 +27,9 @@ export function DateStrip({ items, selectedDate, onSelect, onEndReached }: DateS
     <LegendList
       data={items}
       keyExtractor={(item) => item.date}
+      // `selected` depends on `selectedDate`, which lives outside `item`; without
+      // extraData LegendList memoizes the pills and the highlight never moves on tap.
+      extraData={selectedDate}
       horizontal
       showsHorizontalScrollIndicator={false}
       estimatedItemSize={64}

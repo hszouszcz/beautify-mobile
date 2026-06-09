@@ -64,7 +64,13 @@ export default function PostDetailScreen() {
 
   const imageUrl = USE_MOCK_IMAGES ? mockImageUrl(post.id, 0.8) : post.image_url;
 
-  const featured = booking?.featured_service ?? null;
+  // The service the post "presents": the explicit featured_service, else the
+  // backend's top recommendation for this post (ui_hints). Either one drives the
+  // featured card and lands preselected on the booking service screen. The seed
+  // backend leaves featured_service null, so without the recommended fallback
+  // nothing is ever presented or preselected.
+  const featured =
+    booking?.featured_service ?? booking?.ui_hints?.recommended_services?.[0] ?? null;
   const featuredServiceId = featured?.id ?? post.featured_service?.id;
 
   const onPressSalon = () => {
