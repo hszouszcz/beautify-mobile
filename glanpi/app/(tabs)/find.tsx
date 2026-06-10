@@ -88,6 +88,11 @@ export default function FindScreen() {
           }
           style={{
             paddingTop: insets.top + app.spacing.sm,
+            // SalonList's contentContainerStyle adds spacing.sm of horizontal
+            // inset to the expanded header (ListHeaderComponent). Match that
+            // here (lg + sm) so the title holds its x-position across the
+            // expanded↔compact crossfade — same compensation as Explore.
+            paddingHorizontal: app.spacing.lg + app.spacing.sm,
             backgroundColor: app.colors.backgroundStrong,
             ...app.elevation.card,
           }}
@@ -134,7 +139,7 @@ export default function FindScreen() {
       <SalonList
         salons={salons}
         onPressSalon={goToSalon}
-        ListHeaderComponent={<View style={styles.header}>{expandedHeader}</View>}
+        ListHeaderComponent={expandedHeader}
         sharedScrollOffset={scrollOffset}
         onEndReached={() => {
           if (hasNextPage && !isFetchingNextPage) {
@@ -156,7 +161,7 @@ export default function FindScreen() {
   return (
     <GScreen edges={['top']} padded={false}>
       {compactBar}
-      {!isListView && <View style={styles.header}>{expandedHeader}</View>}
+      {!isListView && expandedHeader}
       <View style={styles.content}>
         {content}
         {showViewToggle && (
@@ -168,7 +173,6 @@ export default function FindScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingVertical: 8 },
   content: { flex: 1 },
   compactBarOuter: {
     position: 'absolute',

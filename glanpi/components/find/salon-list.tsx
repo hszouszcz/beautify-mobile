@@ -64,7 +64,12 @@ export function SalonList({
       refreshing={refreshing}
       onRefresh={onRefresh}
       contentContainerStyle={{
-        paddingHorizontal: app.spacing.lg,
+        // Shared list gutter — matches FeedGrid's `spacing.sm` so the Find and
+        // Explore screens read with the same horizontal rhythm. The expanded
+        // header (a ListHeaderComponent) inherits this inset, landing its title
+        // at `sm + lg` to match Explore; the compact bar compensates with the
+        // same `lg + sm`.
+        paddingHorizontal: app.spacing.sm,
         paddingTop: app.spacing.sm,
         paddingBottom: app.spacing.sm + contentBottomInset,
         gap: app.spacing.md,
