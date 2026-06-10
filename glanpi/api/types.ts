@@ -251,9 +251,12 @@ export interface VerifyPhoneAuthRequest {
 export interface VerifyPhoneAuthResponse {
   message: string;
   user: User;
-  access_token: string;
-  refresh_token: string;
-  created: boolean;
+  // Backend returns the JWT pair as `access`/`refresh` and the new-account flag
+  // as `is_new_user` (API_DOCUMENTATION.md's access_token/refresh_token/created
+  // is stale — verified against the live 200 body).
+  access: string;
+  refresh: string;
+  is_new_user: boolean;
 }
 
 export interface RefreshTokenResponse {
