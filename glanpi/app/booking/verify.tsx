@@ -125,7 +125,7 @@ export default function BookingVerifyScreen() {
       { phone: draft.phone!, code: value },
       {
         onSuccess: (data) => {
-          runCreate(data.created || !data.user.first_name);
+          runCreate(data.is_new_user || !data.user.first_name);
         },
         onError: (err) => {
           setCode('');

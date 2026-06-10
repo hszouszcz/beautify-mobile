@@ -25,14 +25,19 @@ export async function initiatePhoneAuth(
   return data;
 }
 
-/** Verify the SMS code and receive the user + JWT pair. */
+/**
+ * Verify the SMS code and receive the user + JWT pair. The backend expects the
+ * code under `verification_code` (the `code` shown in API_DOCUMENTATION.md is
+ * stale — the live endpoint 400s with "verification_code: This field is
+ * required"); we keep the app-facing field as `code` and map it here at the wire.
+ */
 export async function verifyPhoneAuth(
   body: VerifyPhoneAuthRequest,
 ): Promise<VerifyPhoneAuthResponse> {
-  const { data } = await apiClient.post<VerifyPhoneAuthResponse>(
-    AUTH_PATHS.verify,
-    body,
-  );
+  const { data } = await apiClient.post<VerifyPhoneAuthResponse>(AUTH_PATHS.verify, {
+    phone: body.phone,
+    verification_code: body.code,
+  });
   return data;
 }
 

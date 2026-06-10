@@ -31,7 +31,7 @@ export function useVerifyPhoneAuth() {
     mutationFn: (body) => verifyPhoneAuth(body),
     onSuccess: async (data) => {
       await signIn(
-        { access: data.access_token, refresh: data.refresh_token },
+        { access: data.access, refresh: data.refresh },
         data.user,
       );
     },
