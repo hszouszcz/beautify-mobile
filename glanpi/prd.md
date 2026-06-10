@@ -88,7 +88,7 @@ Zgodnie z mockupem aplikacja ma 4 zakładki:
 |----------|---------|
 | **Explore** | Wizualny feed (siatka zdjęć), filtrowany po mieście **i kategorii** (`post_type`: hair / makeup / nails / skin), pasek „Search inspiration", infinite scroll. |
 | **Find** | Filtrowane przeglądanie po mieście i kategorii, wybór i zmiana miasta. Pełnotekstowe wyszukiwanie po nazwie **poza MVP** (backend nie ma endpointu). |
-| **Calendar** | „Moje rezerwacje" (klient) oraz zarządzanie przychodzącymi rezerwacjami (salon). |
+| **Wizyty** | „Moje wizyty" (klient) — lista rezerwacji klienta podzielona na **nadchodzące** i **minione**. Zarządzanie przychodzącymi rezerwacjami (salon) to osobny widok tej samej zakładki (rozgałęzienie po roli). Route id pozostaje `calendar` (zachowuje deep-link z ekranu potwierdzenia). |
 | **Profile** | Profil, przełączanie roli / wejście w tryb salonu, wylogowanie, minimalne ustawienia. |
 
 ### 5.2 Funkcjonalności — strona KLIENTA
@@ -103,7 +103,7 @@ Zgodnie z mockupem aplikacja ma 4 zakładki:
 8. **Wprowadzenie telefonu + imienia i nazwiska** — pierwszy ekran autentykacji, tuż przed rezerwacją (`POST /accounts/auth/phone/initiate/`).
 9. **Wprowadzenie kodu SMS** — weryfikacja numeru (`POST /accounts/auth/phone/verify/` → JWT).
 10. **Potwierdzenie rezerwacji** — data, godzina, salon, usługa. Status `PENDING`; przy akceptacji ręcznej ekran: „Prośba wysłana — czekaj na potwierdzenie".
-11. **Moje rezerwacje (Calendar)** — lista rezerwacji (`PENDING`/`CONFIRMED`) z możliwością **anulowania** (`POST /bookings/cancel_anonymous/` lub anulowanie zalogowanego) zgodnie z polityką anulowania salonu.
+11. **Moje wizyty (zakładka „Wizyty")** — lista rezerwacji klienta podzielona wizualnie na **nadchodzące** (`PENDING`/`CONFIRMED`) i **minione** (`COMPLETED`/`CANCELLED` lub po czasie), z czytelnym oznaczeniem statusu. Dla nadchodzących: **anulowanie** oraz **zmiana terminu (reschedule)** zgodnie z polityką salonu. Czas każdej wizyty renderowany w strefie czasowej salonu. **Uwaga:** anulowanie zalogowanego klienta wymaga potwierdzenia/dorobienia mobilnego endpointu (`POST /bookings/{id}/cancel/`) — dziś dostępne jest tylko anulowanie anonimowe po tokenie (sekcja 11).
 
 ### 5.3 Funkcjonalności — strona SALONU
 
@@ -129,7 +129,7 @@ Zgodnie z mockupem aplikacja ma 4 zakładki:
 - **Ręczna:** rezerwacja `PENDING`, slot **tymczasowo zablokowany** (mechanizm hold), ekran klienta: „Prośba wysłana".
 - **Anti-abuse:** nowy/niezweryfikowany historycznie klient trafia **automatycznie do akceptacji ręcznej**, nawet jeśli salon ma auto-akceptację.
 - **Anulowanie (symetryczne):** klient anuluje ze swojej listy (zwalnia slot); salon anuluje/odrzuca (`PENDING` lub `CONFIRMED`) z powiadomieniem. **Polityka anulowania jest egzekwowana przez backend** (konfigurowalne wyprzedzenie, np. `notice_hours: 24` — błąd przy próbie anulowania w oknie blokady), a nie „bez ograniczeń czasowych".
-- **Reschedule:** backend wspiera przekładanie terminu (`POST /bookings/reschedule/`, wymagane wyprzedzenie ~2 h) — opcjonalne do włączenia w MVP niskim kosztem.
+- **Reschedule:** backend wspiera przekładanie terminu (`POST /bookings/reschedule/`, wymagane wyprzedzenie ~2 h) — **włączone w MVP po stronie klienta** (akcja „Zmień termin" w zakładce „Wizyty", ponownie wykorzystuje ekran wyboru terminu). Zależne od potwierdzenia payloadu endpointu (sekcja 11).
 
 ### 5.5 Sloty czasowe
 
@@ -222,7 +222,7 @@ Zgodnie z mockupem aplikacja ma 4 zakładki:
 ### Faza 1 (rdzeń MVP)
 - Pełny lejek klienta: feed (Explore) → post/salon → usługa → pracownik → sloty → telefon+imię → SMS → potwierdzenie.
 - Wybór/zmiana miasta (Find), wyszukiwanie podstawowe.
-- Moje rezerwacje + anulowanie (Calendar, klient); opcjonalnie hold slotu.
+- Moje wizyty (zakładka „Wizyty", klient): podział nadchodzące/minione, anulowanie i zmiana terminu; opcjonalnie hold slotu.
 - Tryb salonu: onboarding (kreator), dostępność salonu, usługi, pracownicy, upload postów (istniejące endpointy owner/staff).
 - Zarządzanie rezerwacjami (akceptacja auto/ręczna, anulowanie) — **zależne od potwierdzenia endpointu akceptacji, sekcja 11**.
 - Powiadomienia transakcyjne (push + SMS dla krytycznych zdarzeń).
@@ -239,6 +239,9 @@ Zgodnie z mockupem aplikacja ma 4 zakładki:
 
 ## 11. Otwarte kwestie do potwierdzenia w trakcie realizacji
 - **[Backend] Akceptacja rezerwacji przez salon** — czy istnieje mobilny endpoint `PENDING → CONFIRMED` po stronie salonu oraz flaga „auto-accept" na salonie? W obecnym API widać status „confirmed by salon", ale nie potwierdzono endpointu/ustawienia. Może wymagać dorobienia. **Blokuje** logikę z sekcji 5.4.
+- **[Backend] Anulowanie przez zalogowanego klienta** — brak potwierdzonego mobilnego endpointu (oczekiwany `POST /bookings/{id}/cancel/`, egzekwujący politykę wyprzedzenia); dziś istnieje tylko `cancel_anonymous/` po tokenie, którego zalogowany obiekt `Booking` nie niesie. **Blokuje** akcję „Anuluj" w zakładce „Wizyty".
+- **[Backend] Reschedule — payload** — `POST /bookings/reschedule/` jest wymieniony (sekcja 12), ale wymaga potwierdzenia dokładnego payloadu (`booking` id + nowy `start_time`/slot) i reguły wyprzedzenia. **Blokuje** akcję „Zmień termin".
+- **[Backend] Zakres `GET /bookings/`** — potwierdzić, że zwraca **zarówno nadchodzące, jak i minione** wizyty (w tym `COMPLETED`/`CANCELLED`); jeśli filtruje do aktywnych, sekcja „Minione" będzie wymagać osobnego zapytania/parametru.
 - Ostateczny wybór narzędzia analitycznego (PostHog vs Firebase) — kryterium: brak kosztu.
 - Dokładne ziarno gridu slotów (domyślnie 15 lub 30 min) — jak konfigurowane na backendzie.
 - Wartość limitu aktywnych rezerwacji na numer (start: 3) — gdzie egzekwowane (backend vs mobile).
