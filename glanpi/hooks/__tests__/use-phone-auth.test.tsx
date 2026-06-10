@@ -66,9 +66,9 @@ describe('useVerifyPhoneAuth', () => {
     mockVerify.mockResolvedValue({
       message: 'ok',
       user,
-      access_token: 'acc',
-      refresh_token: 'ref',
-      created: true,
+      access: 'acc',
+      refresh: 'ref',
+      is_new_user: true,
     });
 
     const { result } = renderHookWithProviders(() => ({
