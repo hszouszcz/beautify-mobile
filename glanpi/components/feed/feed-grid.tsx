@@ -80,6 +80,7 @@ export function FeedGrid({
           uri={item.imageUrl}
           aspectRatio={item.aspectRatio}
           onPress={() => onPressTile?.(item)}
+          testID={`feed-tile-${item.id}`}
         />
       )}
     />

@@ -1,0 +1,26 @@
+# Journey 4: Find availability filters — open the filter modal, apply, and
+# confirm the salon list updates without error.
+appId: com.hszcz.glanpi
+name: 04-find-filters
+---
+- runFlow: ../subflows/launch.yaml
+
+- tapOn: "Znajdź"
+
+# Open the filters modal (the filter trigger carries an a11y label).
+- tapOn:
+    id: "filter-button"
+    optional: true
+- tapOn:
+    text: "Filtry|Kiedy"
+    optional: true
+
+# Apply whatever default range is shown.
+- assertVisible:
+    id: "find-filters-apply"
+- tapOn:
+    id: "find-filters-apply"
+
+# Back on the list: at least one salon card is present.
+- assertVisible:
+    id: "salon-card-.*"

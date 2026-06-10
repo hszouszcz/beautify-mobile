@@ -1,0 +1,15 @@
+# Maestro workspace config. Run the whole suite with `maestro test .maestro/flows`.
+# See .maestro/README.md for install + prerequisites (a dev build of the app on a
+# booted simulator/emulator).
+flows:
+  - flows/*.yaml
+
+# Keep the run deterministic: feed → salon flows first, the booking funnel last.
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - 01-browse-and-book-from-feed
+    - 02-search-and-book-from-salon
+    - 03-auth-otp-booking
+    - 04-find-filters
+    - 05-booking-confirmation-state

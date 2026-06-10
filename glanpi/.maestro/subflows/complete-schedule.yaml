@@ -1,0 +1,19 @@
+# Shared step: from the Service step (Wybierz usługę), pick the first service,
+# advance to Schedule, pick the first available slot, and continue. Leaves the
+# flow on either Details (unauthenticated) or Review (authenticated).
+appId: com.hszcz.glanpi
+---
+- assertVisible: "Wybierz usługę"
+- tapOn:
+    id: "service-row-.*"
+    index: 0
+- tapOn:
+    id: "booking-service-next"
+
+- assertVisible: "Wybierz termin"
+# Slot pills expose an a11y label "<time>, dostępny termin" — tap the first one.
+- tapOn:
+    text: ".*dostępny termin"
+    index: 0
+- tapOn:
+    id: "booking-schedule-next"

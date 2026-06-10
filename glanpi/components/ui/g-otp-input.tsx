@@ -15,6 +15,8 @@ export type GOtpInputProps = {
   /** Flash the boxes in the danger color (e.g. wrong code). */
   error?: boolean;
   autoFocus?: boolean;
+  /** Forwarded to the hidden master input (E2E + integration-test selector). */
+  testID?: string;
 };
 
 /**
@@ -30,6 +32,7 @@ export function GOtpInput({
   onComplete,
   error = false,
   autoFocus = true,
+  testID,
 }: GOtpInputProps) {
   const { app } = useAppTheme();
   const inputRef = useRef<TextInput>(null);
@@ -89,6 +92,7 @@ export function GOtpInput({
 
       <TextInput
         ref={inputRef}
+        testID={testID}
         value={value}
         onChangeText={handleChange}
         onFocus={() => setFocused(true)}
