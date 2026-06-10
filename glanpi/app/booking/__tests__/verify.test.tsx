@@ -49,9 +49,9 @@ describe('BookingVerifyScreen', () => {
     mockVerify.mockResolvedValue({
       message: 'ok',
       user: makeUser({ first_name: '' }),
-      access_token: 'acc',
-      refresh_token: 'ref',
-      created: true,
+      access: 'acc',
+      refresh: 'ref',
+      is_new_user: true,
     });
     mockUpdateMe.mockResolvedValue(makeUser({ first_name: 'Ada' }));
     mockCreateBooking.mockResolvedValue({ booking: makeBooking({ status: 'CONFIRMED' }) });
@@ -92,9 +92,9 @@ describe('BookingVerifyScreen', () => {
     mockVerify.mockResolvedValue({
       message: 'ok',
       user: makeUser({ first_name: 'Ada' }),
-      access_token: 'acc',
-      refresh_token: 'ref',
-      created: false,
+      access: 'acc',
+      refresh: 'ref',
+      is_new_user: false,
     });
     mockCreateBooking.mockRejectedValue(new ApiError({ status: 409, message: 'slot taken' }));
 
@@ -110,9 +110,9 @@ describe('BookingVerifyScreen', () => {
     mockVerify.mockResolvedValue({
       message: 'ok',
       user: makeUser({ first_name: 'Ada' }),
-      access_token: 'acc',
-      refresh_token: 'ref',
-      created: false,
+      access: 'acc',
+      refresh: 'ref',
+      is_new_user: false,
     });
     mockCreateBooking.mockRejectedValue(
       new ApiError({ status: 409, message: 'maksymalna liczba — limit' }),
