@@ -172,6 +172,7 @@ export default function BookingVerifyScreen() {
 
         <GOtpInput
           length={4}
+          testID="otp-input"
           value={code}
           onChange={(v) => {
             setCode(v);

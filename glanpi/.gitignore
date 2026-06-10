@@ -38,6 +38,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# test coverage
+coverage/
+.maestro/**/*.log
+
 app-example
 
 # generated native folders

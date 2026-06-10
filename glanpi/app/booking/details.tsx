@@ -111,12 +111,14 @@ export default function BookingDetailsScreen() {
             value={first}
             onChangeText={setFirst}
             autoComplete="name-given"
+            testID="field-firstName"
           />
           <GTextField
             label={t('booking.details.lastName')}
             value={last}
             onChangeText={setLast}
             autoComplete="name-family"
+            testID="field-lastName"
           />
           <GTextField
             label={t('booking.details.phone')}
@@ -125,6 +127,7 @@ export default function BookingDetailsScreen() {
             prefix="+48"
             keyboardType="number-pad"
             autoComplete="tel"
+            testID="field-phone"
             error={national.length > 0 && !phoneValid ? t('booking.details.invalidPhone') : undefined}
           />
 

@@ -1,0 +1,19 @@
+# Journey 1: Explore feed → open a post → start booking from the post CTA.
+appId: com.hszcz.glanpi
+name: 01-browse-and-book-from-feed
+---
+- runFlow: ../subflows/launch.yaml
+
+# Open the first feed tile.
+- tapOn:
+    id: "feed-tile-.*"
+    index: 0
+
+# Post detail shows the tap-to-book CTA.
+- assertVisible:
+    id: "post-book-cta"
+- tapOn:
+    id: "post-book-cta"
+
+# Booking modal opens on the Service step.
+- assertVisible: "Wybierz usługę"

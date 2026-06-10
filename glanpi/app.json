@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hszcz.glanpi",
+      "bundleIdentifier": "com.gleampi",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
@@ -40,7 +40,8 @@
         "googleMaps": {
           "apiKey": "REPLACE_WITH_ANDROID_GOOGLE_MAPS_API_KEY"
         }
-      }
+      },
+      "package": "com.gleampi"
     },
     "web": {
       "output": "static",

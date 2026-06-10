@@ -327,8 +327,9 @@
 **Availability semantics:** a salon matches if it has at least one free slot in the
 window. `date` only → any time those days; `time` only → that window over the next 30
 days; both → time window per day. Times are local wall-clock in each salon's timezone.
-Invalid ranges (`to_date < from_date`, `to_time <= from_time`) or partial geo params
-return `400`. This is a discovery filter, not a booking guarantee.
+Invalid ranges (`to_date < from_date`, `to_time <= from_time`), a date span greater than
+30 days, or partial geo params return `400`. This is a discovery filter, not a booking
+guarantee.
 
 **Response (200 OK):**
 ```json

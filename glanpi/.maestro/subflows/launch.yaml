@@ -1,0 +1,7 @@
+# Shared launch step: cold-start the app and land on the Explore feed.
+# `clearState` makes each flow independent (anonymous browsing is the default).
+appId: com.hszcz.glanpi
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Odkrywaj" # Explore tab label (i18n: tabs.explore)

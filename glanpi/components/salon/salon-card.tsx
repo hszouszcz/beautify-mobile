@@ -23,6 +23,7 @@ export type SalonCardProps = {
   /** Max service rows to show. Default: 3. */
   maxServices?: number;
   onPress?: () => void;
+  testID?: string;
 };
 
 /**
@@ -38,11 +39,12 @@ export function SalonCard({
   services,
   maxServices = 3,
   onPress,
+  testID,
 }: SalonCardProps) {
   const { app } = useAppTheme();
 
   return (
-    <GCard onPress={onPress} padding="md">
+    <GCard onPress={onPress} padding="md" testID={testID}>
       <ImageCollage uris={imageUrls} />
 
       <View style={[styles.header, { marginTop: app.spacing.md }]}>

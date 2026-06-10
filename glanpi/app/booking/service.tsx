@@ -123,6 +123,7 @@ export default function BookingServiceScreen() {
               fromPost={!!params.serviceId && String(item.id) === String(params.serviceId)}
               fromPostLabel={t('booking.fromPost')}
               onPress={() => setSelectedId(String(item.id))}
+              testID={`service-row-${item.id}`}
             />
           )}
         />
