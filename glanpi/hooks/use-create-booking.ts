@@ -4,8 +4,8 @@ import {
   createBooking,
   queryKeys,
   type ApiError,
+  type Booking,
   type CreateBookingRequest,
-  type CreateBookingResponse,
 } from '@/api';
 
 /**
@@ -16,7 +16,7 @@ import {
 export function useCreateBooking() {
   const queryClient = useQueryClient();
 
-  return useMutation<CreateBookingResponse, ApiError, CreateBookingRequest>({
+  return useMutation<Booking, ApiError, CreateBookingRequest>({
     mutationFn: (body) => createBooking(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.mine() });

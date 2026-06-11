@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { createBooking, updateMe, verifyPhoneAuth } from '@/api';
 import BookingVerifyScreen from '@/app/booking/verify';
@@ -39,13 +39,18 @@ const draft = {
 
 describe('BookingVerifyScreen', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     mockVerify.mockReset();
     mockCreateBooking.mockReset();
     mockUpdateMe.mockReset();
     mockRouter.replace.mockReset();
   });
 
-  it('verifies the code, creates the booking, and advances to confirmation', async () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('verifies the code, shows verified phase, patches name for new user, creates booking, and advances to confirmation', async () => {
     mockVerify.mockResolvedValue({
       message: 'ok',
       user: makeUser({ first_name: '' }),
@@ -54,7 +59,7 @@ describe('BookingVerifyScreen', () => {
       is_new_user: true,
     });
     mockUpdateMe.mockResolvedValue(makeUser({ first_name: 'Ada' }));
-    mockCreateBooking.mockResolvedValue({ booking: makeBooking({ status: 'CONFIRMED' }) });
+    mockCreateBooking.mockResolvedValue(makeBooking({ status: 'confirmed' }));
 
     renderBookingScreen(<BookingVerifyScreen />, { draft });
 
@@ -62,6 +67,16 @@ describe('BookingVerifyScreen', () => {
 
     await waitFor(() =>
       expect(mockVerify).toHaveBeenCalledWith({ phone: '+48600700800', code: '1111' }),
+    );
+
+    // Verified phase appears before booking creation starts.
+    expect(await screen.findByText('Numer zweryfikowany!')).toBeOnTheScreen();
+
+    // Advance past the 1 200 ms verified-phase delay.
+    act(() => jest.advanceTimersByTime(1200));
+
+    await waitFor(() =>
+      expect(mockUpdateMe).toHaveBeenCalledWith({ first_name: 'Ada', last_name: 'Kowalska' }),
     );
     await waitFor(() => expect(mockCreateBooking).toHaveBeenCalled());
     await waitFor(() =>
@@ -101,6 +116,9 @@ describe('BookingVerifyScreen', () => {
     renderBookingScreen(<BookingVerifyScreen />, { draft });
     fireEvent.changeText(await screen.findByTestId('otp-input'), '1111');
 
+    await screen.findByText('Numer zweryfikowany!');
+    act(() => jest.advanceTimersByTime(1200));
+
     await waitFor(() =>
       expect(mockRouter.replace).toHaveBeenCalledWith('/booking/schedule'),
     );
@@ -120,6 +138,9 @@ describe('BookingVerifyScreen', () => {
 
     renderBookingScreen(<BookingVerifyScreen />, { draft });
     fireEvent.changeText(await screen.findByTestId('otp-input'), '1111');
+
+    await screen.findByText('Numer zweryfikowany!');
+    act(() => jest.advanceTimersByTime(1200));
 
     expect(
       await screen.findByText('Masz już maksymalną liczbę aktywnych rezerwacji.'),

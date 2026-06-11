@@ -47,8 +47,8 @@ export default function BookingDetailsScreen() {
           set({
             name: { first: first.trim(), last: last.trim() },
             phone,
-            phoneHint: res.phone_number_hint,
-            resendWaitSeconds: res.resend_wait_seconds,
+            phoneHint: res.phone,
+            resendWaitSeconds: res.expires_in_seconds,
           });
           track('phone_submit', {});
           router.push('/booking/verify');

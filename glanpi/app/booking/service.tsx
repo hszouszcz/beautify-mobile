@@ -106,6 +106,7 @@ export default function BookingServiceScreen() {
         <LegendList
           data={options}
           keyExtractor={(item) => String(item.id)}
+          extraData={selectedId}
           estimatedItemSize={72}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: app.spacing.sm, paddingRight: app.spacing.lg }}

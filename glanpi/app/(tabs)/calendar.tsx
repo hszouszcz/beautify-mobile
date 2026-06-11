@@ -52,7 +52,7 @@ export default function BookingsScreen() {
   }, [data, t]);
 
   const browseSalons = () => router.navigate('/(tabs)/find');
-  const openSalon = (booking: Booking) => router.push(`/salon/${booking.salon.id}`);
+  const openSalon = (booking: Booking) => router.push(`/salon/${booking.salon}`);
 
   let content: React.ReactNode;
   if (status !== 'authenticated') {

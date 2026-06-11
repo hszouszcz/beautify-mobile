@@ -45,7 +45,7 @@ describe('BookingReviewScreen', () => {
   });
 
   it('creates the booking and advances to confirmation', async () => {
-    mockCreateBooking.mockResolvedValue({ booking: makeBooking({ status: 'CONFIRMED' }) });
+    mockCreateBooking.mockResolvedValue(makeBooking({ status: 'confirmed' }));
     renderBookingScreen(<BookingReviewScreen />, { draft });
 
     fireEvent.press(await screen.findByTestId('booking-review-confirm'));
@@ -56,6 +56,7 @@ describe('BookingReviewScreen', () => {
         service: 7,
         staff: 3,
         start_time: draft.slot.start_datetime,
+        end_time: draft.slot.end_datetime,
       }),
     );
     await waitFor(() =>

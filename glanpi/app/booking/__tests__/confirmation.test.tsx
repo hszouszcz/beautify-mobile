@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import BookingConfirmationScreen from '@/app/booking/confirmation';
 import { makeBooking, makeService, makeSlotOption, renderBookingScreen } from '@/test/utils';
 
-const mockRouter = { dismissAll: jest.fn(), replace: jest.fn(), push: jest.fn() };
+const mockRouter = { dismissAll: jest.fn(), replace: jest.fn(), push: jest.fn(), navigate: jest.fn() };
 jest.mock('expo-router', () => ({ useRouter: () => mockRouter }));
 
 const baseDraft = {
@@ -19,27 +19,29 @@ describe('BookingConfirmationScreen', () => {
   beforeEach(() => {
     mockRouter.dismissAll.mockReset();
     mockRouter.push.mockReset();
+    mockRouter.navigate.mockReset();
   });
 
   it('shows the CONFIRMED variant for a confirmed booking', async () => {
     renderBookingScreen(<BookingConfirmationScreen />, {
-      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'CONFIRMED' }) },
+      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'confirmed' }) },
     });
     expect(await screen.findByText('Rezerwacja potwierdzona!')).toBeOnTheScreen();
   });
 
   it('shows the PENDING variant for a pending booking', async () => {
     renderBookingScreen(<BookingConfirmationScreen />, {
-      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'PENDING' }) },
+      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'pending' }) },
     });
     expect(await screen.findByText('Prośba wysłana')).toBeOnTheScreen();
   });
 
-  it('dismisses the flow when "Gotowe" is pressed', async () => {
+  it('"Gotowe" navigates to the visits tab (popping the modal stack)', async () => {
     renderBookingScreen(<BookingConfirmationScreen />, {
-      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'CONFIRMED' }) },
+      draft: { ...baseDraft, createdBooking: makeBooking({ status: 'confirmed' }) },
     });
     fireEvent.press(await screen.findByText('Gotowe'));
-    await waitFor(() => expect(mockRouter.dismissAll).toHaveBeenCalled());
+    await waitFor(() => expect(mockRouter.navigate).toHaveBeenCalledWith('/(tabs)/calendar'));
+    expect(mockRouter.dismissAll).not.toHaveBeenCalled();
   });
 });

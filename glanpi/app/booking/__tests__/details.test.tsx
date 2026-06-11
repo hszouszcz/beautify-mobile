@@ -34,8 +34,8 @@ describe('BookingDetailsScreen', () => {
   it('initiates SMS and advances to verify on success', async () => {
     mockInitiate.mockResolvedValue({
       message: 'ok',
-      phone_number_hint: '••• 800',
-      resend_wait_seconds: 30,
+      phone: '••• 800',
+      expires_in_seconds: 30,
     });
     renderBookingScreen(<BookingDetailsScreen />);
 

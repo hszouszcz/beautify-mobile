@@ -77,4 +77,25 @@ describe('BookingScheduleScreen', () => {
 
     await waitFor(() => expect(mockRouter.push).toHaveBeenCalledWith('/booking/details'));
   });
+
+  it('hides slots whose start_datetime is in the past when today is selected', async () => {
+    const pastSlot = makeSlotOption({
+      start_datetime: '2000-01-01T07:00:00Z',
+      end_datetime: '2000-01-01T07:45:00Z',
+    });
+    const futureSlot = makeSlotOption({
+      start_datetime: '2099-12-31T07:00:00Z',
+      end_datetime: '2099-12-31T07:45:00Z',
+      display: { start_time: '11:00:00', end_time: '11:45:00' },
+    });
+    mockAvailability.mockResolvedValue(
+      makeAvailability({ slot_options: [pastSlot, futureSlot] }),
+    );
+
+    renderBookingScreen(<BookingScheduleScreen />, { draft });
+
+    // Only the future slot should be rendered.
+    await screen.findByLabelText(/dostępny termin/);
+    expect(screen.getAllByLabelText(/dostępny termin/)).toHaveLength(1);
+  });
 });

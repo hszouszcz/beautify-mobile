@@ -10,18 +10,18 @@ export type BookingStatusBadgeProps = {
 };
 
 /**
- * Pill badge color-coded by booking status — CONFIRMED→success, PENDING→primary,
- * COMPLETED→muted, CANCELLED→danger. Label comes from i18n (`bookings.status.*`).
+ * Pill badge color-coded by booking status — confirmed→success, pending→primary,
+ * completed→muted, cancelled→danger. Label comes from i18n (`bookings.status.*`).
  */
 export function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
   const { t } = useTranslation();
   const { app } = useAppTheme();
 
   const backgroundByStatus: Record<BookingStatus, string> = {
-    CONFIRMED: app.colors.success,
-    PENDING: app.colors.primary,
-    COMPLETED: app.colors.textMuted,
-    CANCELLED: app.colors.danger,
+    confirmed: app.colors.success,
+    pending: app.colors.primary,
+    completed: app.colors.textMuted,
+    cancelled: app.colors.danger,
   };
 
   return (
@@ -37,7 +37,7 @@ export function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
       ]}
     >
       <GText variant="caption" color="onPrimary">
-        {t(`bookings.status.${status.toLowerCase()}`)}
+        {t(`bookings.status.${status}`)}
       </GText>
     </View>
   );

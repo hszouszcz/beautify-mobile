@@ -117,7 +117,7 @@ describe('useCreateAnonymousBooking', () => {
     const { result } = renderHookWithProviders(() => useCreateAnonymousBooking());
     const body = {
       salon: 1, service: 2, staff: 3, start_time: 't',
-      customer_name: 'Ada', customer_phone: '+48600700800',
+      customer_name: 'Ada', customer_email: 'ada@test.com', customer_phone: '+48600700800',
     };
     await waitFor(async () => {
       await result.current.mutateAsync(body);

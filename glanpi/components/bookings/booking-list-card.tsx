@@ -40,13 +40,12 @@ export function BookingListCard({
   const { t } = useTranslation();
   const { app } = useAppTheme();
 
-  const duration =
-    booking.service.duration_minutes != null
-      ? formatDuration(booking.service.duration_minutes)
-      : undefined;
-  const serviceLine = [booking.service.name, duration].filter(Boolean).join(' · ');
-  const staffName = booking.staff?.display_name ?? booking.staff?.name;
-  const price = formatPrice(booking.service.price_display);
+  const duration = booking.service_duration
+    ? formatDuration(Number(booking.service_duration))
+    : undefined;
+  const serviceLine = [booking.service_name, duration].filter(Boolean).join(' · ');
+  const staffName = booking.staff_name ?? undefined;
+  const price = formatPrice(booking.service_price ?? null);
   const showActions = onCancel != null || onReschedule != null;
 
   return (
@@ -54,7 +53,7 @@ export function BookingListCard({
       <View style={[{ gap: app.spacing.sm }, dimmed && styles.dimmed]}>
         <View style={styles.headerRow}>
           <GText variant="titleSmall" style={styles.salonName} numberOfLines={1}>
-            {booking.salon.name}
+            {booking.salon_name}
           </GText>
           <BookingStatusBadge status={booking.status} />
         </View>
@@ -67,7 +66,7 @@ export function BookingListCard({
           </GText>
         )}
 
-        <Row icon="calendar-clock" text={formatBookingDateTime(booking.start_time, booking.salon.timezone)} />
+        <Row icon="calendar-clock" text={formatBookingDateTime(booking.start_time)} />
         {price != null && <Row icon="cash" text={price} />}
       </View>
 

@@ -184,7 +184,7 @@ export function formatBookingDateTime(isoUtc: string, timeZone?: string): string
  * compare lexicographically against the current UTC instant.
  */
 export function isPastBooking(booking: Booking): boolean {
-  if (booking.status === 'COMPLETED' || booking.status === 'CANCELLED') return true;
+  if (booking.status === 'completed' || booking.status === 'cancelled') return true;
   return booking.end_time < new Date().toISOString();
 }
 

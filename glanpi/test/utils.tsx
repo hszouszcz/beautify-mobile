@@ -215,8 +215,8 @@ export function makeBusinessHours(overrides: Partial<BusinessHours> = {}): Busin
 export function makeSlotOption(overrides: Partial<SlotOption> = {}): SlotOption {
   return {
     slot_ids: [nextId()],
-    start_datetime: '2026-06-12T07:00:00Z',
-    end_datetime: '2026-06-12T07:45:00Z',
+    start_datetime: '2099-12-31T07:00:00Z',
+    end_datetime: '2099-12-31T07:45:00Z',
     display: { start_time: '09:00:00', end_time: '09:45:00' },
     ...overrides,
   };
@@ -230,7 +230,7 @@ export function makeAvailability(
     salon: '1',
     service: '1',
     staff: '1',
-    date: '2026-06-12',
+    date: '2099-12-31',
     slot_options: slots,
     total_options: slots.length,
     ...overrides,
@@ -240,14 +240,20 @@ export function makeAvailability(
 export function makeBooking(overrides: Partial<Booking> = {}): Booking {
   return {
     id: nextId(),
-    salon: { id: 1, name: 'Studio Glanc', address: 'ul. Piękna 1', timezone: 'Europe/Warsaw' },
-    service: { id: 1, name: 'Strzyżenie', duration_minutes: 45, price_display: '180.00' },
-    staff: { id: 1, display_name: 'Marta' },
+    salon: 1,
+    salon_name: 'Studio Glanc',
+    service: 1,
+    service_name: 'Strzyżenie',
+    service_duration: '45',
+    service_price: '180.00',
+    staff: 1,
+    staff_name: 'Marta',
     start_time: '2026-06-12T07:00:00Z',
     end_time: '2026-06-12T07:45:00Z',
-    status: 'CONFIRMED',
-    customer_name: 'Ada Kowalska',
+    status: 'confirmed',
+    booking_token: 'tok-test',
     created_at: '2026-06-10T12:00:00Z',
+    updated_at: '2026-06-10T12:00:00Z',
     ...overrides,
   };
 }

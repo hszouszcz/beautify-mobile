@@ -161,7 +161,7 @@ describe('bookings + simple passthroughs', () => {
     await verifyPhoneAuth({ phone: '+48600700800', code: '1111' });
     expect(post).toHaveBeenLastCalledWith(expect.stringContaining('verify'), {
       phone: '+48600700800',
-      code: '1111',
+      verification_code: '1111',
     });
 
     await resendCode({ phone: '+48600700800' });
@@ -182,7 +182,7 @@ describe('bookings + simple passthroughs', () => {
     post.mockResolvedValue({ data: { booking: { id: 1 } } });
     await createAnonymousBooking({
       salon: 1, service: 2, staff: 3, start_time: 't',
-      customer_name: 'Ada', customer_phone: '+48600700800',
+      customer_name: 'Ada', customer_email: 'ada@test.com', customer_phone: '+48600700800',
     });
     expect(post).toHaveBeenLastCalledWith(
       '/bookings/create_anonymous/',

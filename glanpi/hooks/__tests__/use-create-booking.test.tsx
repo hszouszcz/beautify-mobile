@@ -18,7 +18,7 @@ describe('useCreateBooking', () => {
   beforeEach(() => mockCreateBooking.mockReset());
 
   it('invalidates "my bookings" after a successful create', async () => {
-    mockCreateBooking.mockResolvedValue({ booking: makeBooking() });
+    mockCreateBooking.mockResolvedValue(makeBooking());
     const { result, queryClient } = renderHookWithProviders(() => useCreateBooking());
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 

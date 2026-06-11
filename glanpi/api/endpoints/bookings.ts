@@ -44,11 +44,11 @@ export async function createSlotHold(
   return data;
 }
 
-/** Create a booking for the authenticated user. PROTECTED. */
+/** Create a booking for the authenticated user. PROTECTED. Returns the booking directly. */
 export async function createBooking(
   body: CreateBookingRequest,
-): Promise<CreateBookingResponse> {
-  const { data } = await apiClient.post<CreateBookingResponse>('/bookings/', body);
+): Promise<Booking> {
+  const { data } = await apiClient.post<Booking>('/bookings/', body);
   return data;
 }
 

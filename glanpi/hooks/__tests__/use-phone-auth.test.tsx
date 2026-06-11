@@ -24,8 +24,8 @@ describe('useInitiatePhoneAuth', () => {
   it('returns the SMS hint + resend window on success', async () => {
     mockInitiate.mockResolvedValue({
       message: 'ok',
-      phone_number_hint: '••• ••• 800',
-      resend_wait_seconds: 30,
+      phone: '••• ••• 800',
+      expires_in_seconds: 30,
     });
     const { result } = renderHookWithProviders(() => useInitiatePhoneAuth());
 
@@ -34,7 +34,7 @@ describe('useInitiatePhoneAuth', () => {
       data = await result.current.mutateAsync({ phone: '+48600700800' });
     });
 
-    expect(data).toMatchObject({ resend_wait_seconds: 30 });
+    expect(data).toMatchObject({ expires_in_seconds: 30 });
     expect(mockInitiate).toHaveBeenCalledWith({ phone: '+48600700800' });
   });
 
