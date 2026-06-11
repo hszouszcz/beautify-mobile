@@ -15,6 +15,10 @@ export type GOtpInputProps = {
   /** Flash the boxes in the danger color (e.g. wrong code). */
   error?: boolean;
   autoFocus?: boolean;
+  /** Blocks further input and dims the boxes (e.g. while verifying). */
+  disabled?: boolean;
+  /** Forwarded to the hidden master input (E2E + integration-test selector). */
+  testID?: string;
 };
 
 /**
@@ -30,12 +34,15 @@ export function GOtpInput({
   onComplete,
   error = false,
   autoFocus = true,
+  disabled = false,
+  testID,
 }: GOtpInputProps) {
   const { app } = useAppTheme();
   const inputRef = useRef<TextInput>(null);
   const [focused, setFocused] = useState(false);
 
   const handleChange = (raw: string) => {
+    if (disabled) return;
     const digits = raw.replace(/\D/g, '').slice(0, length);
     onChange(digits);
     if (digits.length === length) onComplete?.(digits);
@@ -77,6 +84,7 @@ export function GOtpInput({
                 borderColor,
                 borderRadius: app.radius.md,
                 backgroundColor: app.colors.surface,
+                opacity: disabled ? 0.5 : 1,
               },
             ]}
           >
@@ -89,6 +97,7 @@ export function GOtpInput({
 
       <TextInput
         ref={inputRef}
+        testID={testID}
         value={value}
         onChangeText={handleChange}
         onFocus={() => setFocused(true)}
@@ -97,6 +106,7 @@ export function GOtpInput({
         textContentType="oneTimeCode"
         autoComplete="sms-otp"
         maxLength={length}
+        editable={!disabled}
         style={styles.hiddenInput}
         caretHidden
       />

@@ -41,6 +41,7 @@ export function SalonListItem({ salon, onPress }: SalonListItemProps) {
       meta={salon.address}
       services={cardServices}
       onPress={() => onPress(salon)}
+      testID={`salon-card-${salon.id}`}
     />
   );
 }

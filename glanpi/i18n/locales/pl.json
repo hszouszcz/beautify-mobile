@@ -3,7 +3,7 @@
     "tabs": {
       "explore": "Odkrywaj",
       "find": "Znajdź",
-      "calendar": "Kalendarz",
+      "bookings": "Wizyty",
       "profile": "Profil"
     },
     "explore": {
@@ -136,6 +136,7 @@
         "noCode": "Nie otrzymałeś kodu?",
         "wrong": "Nieprawidłowy kod",
         "expired": "Kod wygasł. Wyślij nowy.",
+        "verified": "Numer zweryfikowany!",
         "creating": "Tworzymy rezerwację…"
       },
       "review": {
@@ -162,6 +163,46 @@
         "limit": "Masz już maksymalną liczbę aktywnych rezerwacji.",
         "rateLimit": "Zbyt wiele prób. Spróbuj za {{seconds}}s.",
         "generic": "Coś poszło nie tak. Spróbuj ponownie."
+      }
+    },
+    "bookings": {
+      "title": "Moje wizyty",
+      "section": {
+        "upcoming": "Nadchodzące",
+        "past": "Minione"
+      },
+      "status": {
+        "pending": "Oczekuje",
+        "confirmed": "Potwierdzona",
+        "completed": "Zakończona",
+        "cancelled": "Anulowana"
+      },
+      "empty": {
+        "title": "Nie masz jeszcze wizyt",
+        "description": "Zarezerwuj pierwszą wizytę, a pojawi się tutaj.",
+        "action": "Przeglądaj salony"
+      },
+      "signedOut": {
+        "title": "Zaloguj się, aby zobaczyć wizyty",
+        "description": "Twoje rezerwacje pojawią się tutaj po zalogowaniu.",
+        "action": "Przeglądaj salony"
+      },
+      "error": {
+        "title": "Nie udało się wczytać wizyt",
+        "retry": "Spróbuj ponownie"
+      },
+      "cancel": {
+        "action": "Anuluj",
+        "confirmTitle": "Anulować wizytę?",
+        "confirmMessage": "Tej operacji nie można cofnąć.",
+        "confirm": "Anuluj wizytę",
+        "dismiss": "Wróć",
+        "policyError": "Za późno na bezpłatne anulowanie tej wizyty.",
+        "genericError": "Nie udało się anulować wizyty. Spróbuj ponownie."
+      },
+      "reschedule": {
+        "action": "Zmień termin",
+        "genericError": "Nie udało się zmienić terminu. Spróbuj ponownie."
       }
     },
     "common": {

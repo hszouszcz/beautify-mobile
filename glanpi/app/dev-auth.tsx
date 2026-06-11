@@ -54,7 +54,7 @@ export default function DevAuthScreen() {
           onPress={() => initiate.mutate({ phone })}
           disabled={initiate.isPending}
         />
-        {initiate.isSuccess ? <GText color="primary">sent: {initiate.data.phone_number_hint}</GText> : null}
+        {initiate.isSuccess ? <GText color="primary">sent: {initiate.data.phone}</GText> : null}
         {initiate.error ? <GText color="danger">{initiate.error.status}: {initiate.error.message}</GText> : null}
 
         <GText variant="caption">2. Verify → sign in (proves token storage)</GText>

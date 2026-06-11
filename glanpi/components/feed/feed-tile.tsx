@@ -9,17 +9,19 @@ export type FeedTileProps = {
   onPress?: () => void;
   /** width / height. 1 = square (default), <1 = portrait. */
   aspectRatio?: number;
+  testID?: string;
 };
 
 /**
  * A single feed image tile (Explore grid cell). Fills its column width and
  * keeps a fixed aspect ratio. Uses `expo-image` for caching/perf.
  */
-export function FeedTile({ uri, onPress, aspectRatio = 1 }: FeedTileProps) {
+export function FeedTile({ uri, onPress, aspectRatio = 1, testID }: FeedTileProps) {
   const { app } = useAppTheme();
 
   return (
     <GPressable
+      testID={testID}
       onPress={onPress}
       style={[styles.tile, { borderRadius: app.radius.sm, aspectRatio }]}
     >

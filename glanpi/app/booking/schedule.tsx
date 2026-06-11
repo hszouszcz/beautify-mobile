@@ -25,9 +25,11 @@ import { track } from '@/lib/analytics';
 import {
   buildDateStrip,
   closedDays,
+  dayOfWeekMon0,
   formatShortDate,
   formatSlotTime,
   monthLabel,
+  todayInTz,
 } from '@/lib/datetime';
 import { formatDuration, formatPrice } from '@/lib/format';
 import { useBookingDraft } from '@/providers/booking-draft-provider';
@@ -113,13 +115,38 @@ export default function BookingScheduleScreen() {
     setSelectedSlotKey(undefined);
   }, [staffId, selectedDate]);
 
+  // Filter slots: respect business hours, then drop past slots for today.
+  const slotOptions = useMemo(() => {
+    let options = availability.data?.slot_options ?? [];
+
+    if (hours?.length && selectedDate) {
+      const dow = dayOfWeekMon0(selectedDate);
+      const dayHours = hours.find((h) => h.day_of_week === dow);
+      if (dayHours && !dayHours.is_closed && dayHours.open_time && dayHours.close_time) {
+        const open = dayHours.open_time.slice(0, 8);
+        const close = dayHours.close_time.slice(0, 8);
+        // display.start_time is already in salon-local time ("HH:MM:SS"), same
+        // format as open_time/close_time — no timezone conversion needed.
+        options = options.filter((slot) => {
+          const t = slot.display.start_time.slice(0, 8);
+          return t >= open && t < close;
+        });
+      }
+    }
+
+    const today = todayInTz(draft.timezone);
+    if (selectedDate !== today) return options;
+    const now = new Date();
+    return options.filter((o) => new Date(o.start_datetime) > now);
+  }, [availability.data?.slot_options, selectedDate, draft.timezone, hours]);
+
   const gridState: TimeSlotGridState = !service
     ? 'empty'
     : availability.isLoading
       ? 'loading'
       : availability.isError
         ? 'error'
-        : (availability.data?.slot_options.length ?? 0) === 0
+        : slotOptions.length === 0
           ? 'empty'
           : 'ready';
 
@@ -136,7 +163,7 @@ export default function BookingScheduleScreen() {
 
   const onNext = async () => {
     if (!draft.slot && !selectedSlotKey) return;
-    const slot = availability.data?.slot_options.find((s) => s.start_datetime === selectedSlotKey);
+    const slot = slotOptions.find((s) => s.start_datetime === selectedSlotKey);
     if (!slot) return;
 
     set({ slot, date: selectedDate, staffId, staffName: staffMembers.find((m) => m.id === staffId)?.name });
@@ -157,8 +184,7 @@ export default function BookingScheduleScreen() {
   const summary =
     selectedDate && selectedSlotKey
       ? `${formatShortDate(selectedDate)} · ${formatSlotTime(
-          availability.data?.slot_options.find((s) => s.start_datetime === selectedSlotKey)?.display
-            .start_time ?? '',
+          slotOptions.find((s) => s.start_datetime === selectedSlotKey)?.display.start_time ?? '',
         )}`
       : undefined;
 
@@ -204,7 +230,7 @@ export default function BookingScheduleScreen() {
       />
 
       <TimeSlotGrid
-        options={availability.data?.slot_options ?? []}
+        options={slotOptions}
         state={gridState}
         selectedKey={selectedSlotKey}
         onSelect={onSelectSlot}

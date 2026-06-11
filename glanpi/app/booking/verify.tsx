@@ -1,8 +1,10 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, View } from 'react-native';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import { queryKeys, resendCode, type ApiError } from '@/api';
 import { BookingModalHeader, HoldCountdownBanner } from '@/components/booking';
@@ -21,7 +23,7 @@ import { track } from '@/lib/analytics';
 import { useBookingDraft } from '@/providers/booking-draft-provider';
 import { useAppTheme } from '@/theme';
 
-type Phase = 'code' | 'creating' | 'createError';
+type Phase = 'code' | 'verified' | 'creating' | 'createError';
 
 /**
  * Booking · Step 4 — SMS verification + create (design §5.4, plan §8.4). On a
@@ -44,11 +46,12 @@ export default function BookingVerifyScreen() {
   const [phase, setPhase] = useState<Phase>('code');
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
   const [cooldown, setCooldown] = useState(draft.resendWaitSeconds ?? 30);
+  const verifiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resend = useMutation<unknown, ApiError, void>({
     mutationFn: () => resendCode({ phone: draft.phone! }),
     onSuccess: (res) => {
-      const wait = (res as { resend_wait_seconds?: number }).resend_wait_seconds ?? 30;
+      const wait = (res as { expires_in_seconds?: number }).expires_in_seconds ?? 30;
       setCooldown(wait);
     },
   });
@@ -58,6 +61,12 @@ export default function BookingVerifyScreen() {
     const id = setInterval(() => setCooldown((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(id);
   }, [cooldown]);
+
+  useEffect(() => {
+    return () => {
+      if (verifiedTimerRef.current) clearTimeout(verifiedTimerRef.current);
+    };
+  }, []);
 
   const runCreate = async (needName: boolean) => {
     setPhase('creating');
@@ -74,8 +83,8 @@ export default function BookingVerifyScreen() {
         staff: draft.staffId!,
         start_time: draft.slot!.start_datetime,
       });
-      set({ createdBooking: res.booking });
-      track('booking_created', { status: res.booking.status });
+      set({ createdBooking: res });
+      track('booking_created', { status: res.status });
       router.replace('/booking/confirmation');
     } catch (err) {
       handleCreateError(err as ApiError);
@@ -120,12 +129,15 @@ export default function BookingVerifyScreen() {
   };
 
   const onComplete = (value: string) => {
+    if (verify.isPending) return;
     setCodeError(undefined);
     verify.mutate(
       { phone: draft.phone!, code: value },
       {
         onSuccess: (data) => {
-          runCreate(data.created || !data.user.first_name);
+          const needName = data.is_new_user || !data.user.first_name;
+          setPhase('verified');
+          verifiedTimerRef.current = setTimeout(() => runCreate(needName), 1200);
         },
         onError: (err) => {
           setCode('');
@@ -137,7 +149,22 @@ export default function BookingVerifyScreen() {
     );
   };
 
-  if (phase === 'creating' || verify.isPending) {
+  if (phase === 'verified') {
+    return (
+      <GScreen edges={['top']} tone="background">
+        <View style={styles.center}>
+          <Animated.View entering={ZoomIn.duration(300)}>
+            <MaterialCommunityIcons name="check-circle" size={72} color={app.colors.success} />
+          </Animated.View>
+          <GText variant="title" align="center">
+            {t('booking.verify.verified')}
+          </GText>
+        </View>
+      </GScreen>
+    );
+  }
+
+  if (phase === 'creating') {
     return (
       <GScreen edges={['top']} tone="background">
         <View style={styles.center}>
@@ -172,6 +199,7 @@ export default function BookingVerifyScreen() {
 
         <GOtpInput
           length={4}
+          testID="otp-input"
           value={code}
           onChange={(v) => {
             setCode(v);
@@ -179,6 +207,7 @@ export default function BookingVerifyScreen() {
           }}
           onComplete={onComplete}
           error={!!codeError}
+          disabled={verify.isPending}
         />
 
         {codeError && (

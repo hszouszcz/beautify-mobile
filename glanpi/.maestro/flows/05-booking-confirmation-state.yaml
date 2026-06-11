@@ -1,0 +1,38 @@
+# Journey 5: assert the confirmation screen renders one of its two states
+# (CONFIRMED vs PENDING) at the end of a salon-initiated booking. Complements 03
+# (feed entry) by exercising the salon entry point through to confirmation.
+appId: com.hszcz.glanpi
+name: 05-booking-confirmation-state
+env:
+  TEST_PHONE: "600700800"
+  TEST_OTP: "1111"
+---
+- runFlow: ../subflows/launch.yaml
+
+# Enter the funnel from a salon, then run the shared schedule step.
+- tapOn: "Znajdź"
+- tapOn:
+    id: "salon-card-.*"
+    index: 0
+- tapOn:
+    id: "salon-book-cta"
+- runFlow: ../subflows/complete-schedule.yaml
+
+# Details → verify (unauthenticated path).
+- assertVisible: "Twoje dane"
+- tapOn:
+    id: "field-firstName"
+- inputText: "Ada"
+- tapOn:
+    id: "field-phone"
+- inputText: ${TEST_PHONE}
+- hideKeyboard
+- tapOn:
+    id: "booking-details-send"
+- tapOn:
+    id: "otp-input"
+- inputText: ${TEST_OTP}
+
+# The confirmation screen must show exactly one of the two state headlines.
+- assertVisible:
+    text: "Rezerwacja potwierdzona!|Prośba wysłana"

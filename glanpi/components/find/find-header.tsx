@@ -78,6 +78,7 @@ export function FindHeader({
       }
       search={
         <GSearchBar
+          testID="find-search-input"
           placeholder={t('find.searchPlaceholder')}
           value={search}
           onChangeText={onChangeSearch}

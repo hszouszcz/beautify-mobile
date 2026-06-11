@@ -106,6 +106,7 @@ export default function BookingServiceScreen() {
         <LegendList
           data={options}
           keyExtractor={(item) => String(item.id)}
+          extraData={selectedId}
           estimatedItemSize={72}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: app.spacing.sm, paddingRight: app.spacing.lg }}
@@ -123,6 +124,7 @@ export default function BookingServiceScreen() {
               fromPost={!!params.serviceId && String(item.id) === String(params.serviceId)}
               fromPostLabel={t('booking.fromPost')}
               onPress={() => setSelectedId(String(item.id))}
+              testID={`service-row-${item.id}`}
             />
           )}
         />

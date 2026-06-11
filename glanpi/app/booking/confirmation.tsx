@@ -2,7 +2,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 import { BookingSummaryCard } from '@/components/booking';
@@ -26,23 +26,18 @@ export default function BookingConfirmationScreen() {
   const { draft, reset } = useBookingDraft();
 
   const booking = draft.createdBooking;
-  const isConfirmed = booking?.status === 'CONFIRMED';
+  const isConfirmed = booking?.status === 'confirmed';
 
   useEffect(() => {
-    if (isConfirmed) track('booking_confirmed', { status: 'CONFIRMED' });
+    if (isConfirmed) track('booking_confirmed', { status: 'confirmed' });
   }, [isConfirmed]);
 
   const service = draft.service;
   const slotTime = draft.slot ? formatSlotTime(draft.slot.display.start_time) : '';
 
-  const close = () => {
+  const done = () => {
     reset();
-    router.dismissAll();
-  };
-  const viewInCalendar = () => {
-    reset();
-    router.dismissAll();
-    router.push('/(tabs)/calendar');
+    router.navigate('/(tabs)/calendar');
   };
 
   return (
@@ -73,7 +68,7 @@ export default function BookingConfirmationScreen() {
 
         {service && (
           <BookingSummaryCard
-            salonName={draft.salonName ?? booking?.salon.name ?? ''}
+            salonName={draft.salonName ?? booking?.salon_name ?? ''}
             serviceName={service.name}
             duration={formatDuration(service.duration_minutes)}
             staffLine={
@@ -93,20 +88,12 @@ export default function BookingConfirmationScreen() {
       </ScrollView>
 
       <GBottomBar>
-        <View style={styles.actions}>
-          <GButton
-            kind="secondary"
-            fullWidth
-            label={t('booking.confirmation.viewInCalendar')}
-            onPress={viewInCalendar}
-          />
-          <GButton
-            fullWidth
-            label={t('booking.confirmation.done')}
-            onPress={close}
-            testID="booking-done"
-          />
-        </View>
+        <GButton
+          fullWidth
+          label={t('booking.confirmation.done')}
+          onPress={done}
+          testID="booking-done"
+        />
       </GBottomBar>
     </GScreen>
   );
@@ -116,5 +103,4 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
   iconWrap: { alignItems: 'center' },
   heading: { alignItems: 'center' },
-  actions: { flex: 1, gap: 8 },
 });

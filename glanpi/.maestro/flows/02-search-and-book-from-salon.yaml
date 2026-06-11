@@ -1,0 +1,25 @@
+# Journey 2: Find tab → search → open a salon → start booking from salon detail.
+appId: com.hszcz.glanpi
+name: 02-search-and-book-from-salon
+---
+- runFlow: ../subflows/launch.yaml
+
+- tapOn: "Znajdź" # Find tab (i18n: tabs.find)
+- tapOn:
+    id: "find-search-input"
+- inputText: "salon"
+- hideKeyboard
+
+# Open the first salon card in the list.
+- assertVisible:
+    id: "salon-card-.*"
+- tapOn:
+    id: "salon-card-.*"
+    index: 0
+
+# Salon detail → primary CTA opens the booking modal on the Service step.
+- assertVisible:
+    id: "salon-book-cta"
+- tapOn:
+    id: "salon-book-cta"
+- assertVisible: "Wybierz usługę"

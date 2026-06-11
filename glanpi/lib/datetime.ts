@@ -7,7 +7,7 @@
  * (plan §8.3).
  */
 
-import type { BusinessHours } from '@/api';
+import type { Booking, BusinessHours } from '@/api';
 
 /** ISO weekday with Monday=0 … Sunday=6 (matches `BusinessHours.day_of_week`). */
 export function dayOfWeekMon0(isoDate: string): number {
@@ -149,6 +149,43 @@ export function formatLongDate(isoDate: string): string {
     month: 'long',
     timeZone: 'UTC',
   }).format(anchor);
+}
+
+/**
+ * ISO-UTC timestamp → "Wt, 12 cze · 09:00" in the salon's timezone. Unlike the
+ * `YYYY-MM-DD` helpers above, a booking carries a full instant (`start_time`),
+ * so we render both the calendar date and the wall-clock time in `timeZone`
+ * (the salon's), falling back to the device timezone when it's missing.
+ */
+export function formatBookingDateTime(isoUtc: string, timeZone?: string): string {
+  const instant = new Date(isoUtc);
+  const date = new Intl.DateTimeFormat('pl-PL', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone,
+  })
+    .format(instant)
+    .replace(/\./g, '');
+  const time = new Intl.DateTimeFormat('pl-PL', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone,
+  }).format(instant);
+  const capitalized = date.charAt(0).toUpperCase() + date.slice(1);
+  return `${capitalized} · ${time}`;
+}
+
+/**
+ * Whether a booking belongs to the "Minione" (past) section. A booking is past
+ * if it's `COMPLETED`/`CANCELLED`, or its `end_time` has already passed — so a
+ * future-but-cancelled visit never shows under "Nadchodzące". ISO-UTC strings
+ * compare lexicographically against the current UTC instant.
+ */
+export function isPastBooking(booking: Booking): boolean {
+  if (booking.status === 'completed' || booking.status === 'cancelled') return true;
+  return booking.end_time < new Date().toISOString();
 }
 
 export type PartOfDay = 'morning' | 'afternoon' | 'evening';

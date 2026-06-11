@@ -9,6 +9,9 @@ export type GPressableProps = {
   borderless?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Forwarded to the touchable for E2E + integration-test selectors. */
+  testID?: string;
+  accessibilityLabel?: string;
   children: React.ReactNode;
 };
 
@@ -22,6 +25,8 @@ export function GPressable({
   borderless = true,
   disabled,
   style,
+  testID,
+  accessibilityLabel,
   children,
 }: GPressableProps) {
   const { app } = useAppTheme();
@@ -33,6 +38,8 @@ export function GPressable({
       disabled={disabled}
       rippleColor={app.colors.backgroundStrong}
       style={style}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
     >
       <>{children}</>
     </TouchableRipple>

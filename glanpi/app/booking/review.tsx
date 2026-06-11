@@ -65,9 +65,10 @@ export default function BookingReviewScreen() {
         service: service.id,
         staff: draft.staffId,
         start_time: draft.slot.start_datetime,
+        end_time: draft.slot.end_datetime,
       });
-      set({ createdBooking: res.booking });
-      track('booking_created', { status: res.booking.status });
+      set({ createdBooking: res });
+      track('booking_created', { status: res.status });
       router.replace('/booking/confirmation');
     } catch (e) {
       const err = e as ApiError;

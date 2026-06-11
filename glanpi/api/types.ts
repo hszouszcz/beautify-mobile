@@ -193,24 +193,31 @@ export interface SlotHold {
 
 // --- Bookings ---
 
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
-/** Embedded salon/service/staff objects vary by endpoint — kept intentionally loose. */
+/**
+ * Flat booking shape as returned by both `GET /bookings/` (BookingDetail) and
+ * `POST /bookings/` (Booking). The `*_name` / `*_duration` / `*_price` fields
+ * are only present on the detail serialiser (list/retrieve); they are optional
+ * here so the same type covers the create response too.
+ */
 export interface Booking {
-  id: number | string;
-  salon: { id: number | string; name: string; address?: string; timezone?: string };
-  service: {
-    id: number | string;
-    name: string;
-    duration_minutes?: number;
-    price_display?: string | null;
-  };
-  staff: { id: number | string; display_name?: string; name?: string } | null;
+  id: number;
+  salon: number;
+  salon_name?: string;
+  service: number;
+  service_name?: string;
+  service_duration?: string; // "60" (minutes as string)
+  service_price?: string | null;
+  staff: number | null;
+  staff_name?: string | null;
   start_time: string; // ISO UTC
   end_time: string;
+  notes?: string;
   status: BookingStatus;
-  customer_name?: string;
+  booking_token: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface CreateBookingRequest {
@@ -218,17 +225,21 @@ export interface CreateBookingRequest {
   service: number | string;
   staff: number | string;
   start_time: string; // = SlotOption.start_datetime
+  end_time?: string;
 }
 
 export interface CreateAnonymousBookingRequest extends CreateBookingRequest {
   customer_name: string;
-  customer_email?: string;
+  customer_email: string;
   customer_phone: string;
 }
 
+/** Response envelope from `POST /bookings/create_anonymous/`. */
 export interface CreateBookingResponse {
+  message: string;
   booking: Booking;
-  booking_token?: string;
+  booking_token: string;
+  instructions?: string;
 }
 
 // --- Auth request/response shapes ---
@@ -239,8 +250,9 @@ export interface InitiatePhoneAuthRequest {
 
 export interface InitiatePhoneAuthResponse {
   message: string;
-  phone_number_hint: string;
-  resend_wait_seconds: number;
+  phone: string;
+  expires_in_seconds: number;
+  is_new_user?: boolean;
 }
 
 export interface VerifyPhoneAuthRequest {
@@ -251,9 +263,12 @@ export interface VerifyPhoneAuthRequest {
 export interface VerifyPhoneAuthResponse {
   message: string;
   user: User;
-  access_token: string;
-  refresh_token: string;
-  created: boolean;
+  // Backend returns the JWT pair as `access`/`refresh` and the new-account flag
+  // as `is_new_user` (API_DOCUMENTATION.md's access_token/refresh_token/created
+  // is stale — verified against the live 200 body).
+  access: string;
+  refresh: string;
+  is_new_user: boolean;
 }
 
 export interface RefreshTokenResponse {

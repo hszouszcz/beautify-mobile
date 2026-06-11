@@ -15,6 +15,7 @@ export type ServiceOptionRowProps = {
   fromPost?: boolean;
   fromPostLabel: string;
   onPress: () => void;
+  testID?: string;
 };
 
 /** Single-select service row (radio semantics) for booking Step 1 (design §5.1). */
@@ -26,6 +27,7 @@ export function ServiceOptionRow({
   fromPost,
   fromPostLabel,
   onPress,
+  testID,
 }: ServiceOptionRowProps) {
   const { app } = useAppTheme();
 
@@ -33,6 +35,7 @@ export function ServiceOptionRow({
     <GPressable
       onPress={onPress}
       borderless={false}
+      testID={testID}
       style={[
         styles.row,
         {

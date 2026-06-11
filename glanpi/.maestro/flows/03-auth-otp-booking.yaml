@@ -1,0 +1,42 @@
+# Journey 3: full unauthenticated booking — service → schedule → details (phone)
+# → SMS OTP → confirmation. Uses the backend's dev test code (1111); point
+# TEST_PHONE at a number your staging SMS provider accepts.
+appId: com.hszcz.glanpi
+name: 03-auth-otp-booking
+env:
+  TEST_PHONE: "600700800" # 9-digit national part; the app prefixes +48
+  TEST_OTP: "1111"
+---
+- runFlow: ../subflows/launch.yaml
+
+# Reach the booking funnel from the feed, then run the shared schedule step.
+- tapOn:
+    id: "feed-tile-.*"
+    index: 0
+- tapOn:
+    id: "post-book-cta"
+- runFlow: ../subflows/complete-schedule.yaml
+
+# Details step (unauthenticated): name + phone, then request the SMS code.
+- assertVisible: "Twoje dane"
+- tapOn:
+    id: "field-firstName"
+- inputText: "Ada"
+- tapOn:
+    id: "field-phone"
+- inputText: ${TEST_PHONE}
+- hideKeyboard
+- tapOn:
+    id: "booking-details-send"
+
+# Verify step: enter the 4-digit code (auto-submits on completion).
+- assertVisible: "Potwierdź numer"
+- tapOn:
+    id: "otp-input"
+- inputText: ${TEST_OTP}
+
+# Confirmation: either CONFIRMED or PENDING depending on the salon's settings.
+- assertVisible:
+    text: "Rezerwacja potwierdzona!|Prośba wysłana"
+- tapOn:
+    id: "booking-done"
