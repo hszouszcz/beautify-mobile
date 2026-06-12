@@ -37,6 +37,7 @@ export default function BookingConfirmationScreen() {
 
   const done = () => {
     reset();
+    router.dismissAll();
     router.navigate('/(tabs)/calendar');
   };
 

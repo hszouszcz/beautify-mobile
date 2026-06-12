@@ -36,12 +36,18 @@ describe('BookingConfirmationScreen', () => {
     expect(await screen.findByText('Prośba wysłana')).toBeOnTheScreen();
   });
 
-  it('"Gotowe" navigates to the visits tab (popping the modal stack)', async () => {
+  it('"Gotowe" dismisses the modal stack then switches to the calendar tab', async () => {
+    const callOrder: string[] = [];
+    mockRouter.dismissAll.mockImplementation(() => callOrder.push('dismissAll'));
+    mockRouter.navigate.mockImplementation(() => callOrder.push('navigate'));
+
     renderBookingScreen(<BookingConfirmationScreen />, {
       draft: { ...baseDraft, createdBooking: makeBooking({ status: 'confirmed' }) },
     });
     fireEvent.press(await screen.findByText('Gotowe'));
-    await waitFor(() => expect(mockRouter.navigate).toHaveBeenCalledWith('/(tabs)/calendar'));
-    expect(mockRouter.dismissAll).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(mockRouter.dismissAll).toHaveBeenCalled());
+    expect(mockRouter.navigate).toHaveBeenCalledWith('/(tabs)/calendar');
+    expect(callOrder).toEqual(['dismissAll', 'navigate']);
   });
 });
