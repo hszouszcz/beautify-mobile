@@ -1,10 +1,14 @@
+import { CommonActions } from '@react-navigation/native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import BookingConfirmationScreen from '@/app/booking/confirmation';
 import { makeBooking, makeService, makeSlotOption, renderBookingScreen } from '@/test/utils';
 
-const mockRouter = { dismissAll: jest.fn(), replace: jest.fn(), push: jest.fn(), navigate: jest.fn() };
-jest.mock('expo-router', () => ({ useRouter: () => mockRouter }));
+const mockDispatch = jest.fn();
+jest.mock('expo-router', () => ({
+  ...jest.requireActual('expo-router'),
+  useNavigationContainerRef: () => ({ dispatch: mockDispatch, isReady: () => true }),
+}));
 
 const baseDraft = {
   salonName: 'Studio Glanc',
@@ -16,11 +20,7 @@ const baseDraft = {
 };
 
 describe('BookingConfirmationScreen', () => {
-  beforeEach(() => {
-    mockRouter.dismissAll.mockReset();
-    mockRouter.push.mockReset();
-    mockRouter.navigate.mockReset();
-  });
+  beforeEach(() => mockDispatch.mockReset());
 
   it('shows the CONFIRMED variant for a confirmed booking', async () => {
     renderBookingScreen(<BookingConfirmationScreen />, {
@@ -36,18 +36,29 @@ describe('BookingConfirmationScreen', () => {
     expect(await screen.findByText('Prośba wysłana')).toBeOnTheScreen();
   });
 
-  it('"Gotowe" dismisses the modal stack then switches to the calendar tab', async () => {
-    const callOrder: string[] = [];
-    mockRouter.dismissAll.mockImplementation(() => callOrder.push('dismissAll'));
-    mockRouter.navigate.mockImplementation(() => callOrder.push('navigate'));
-
+  it('"Gotowe" resets root navigation state to the calendar tab', async () => {
     renderBookingScreen(<BookingConfirmationScreen />, {
       draft: { ...baseDraft, createdBooking: makeBooking({ status: 'confirmed' }) },
     });
     fireEvent.press(await screen.findByText('Gotowe'));
 
-    await waitFor(() => expect(mockRouter.dismissAll).toHaveBeenCalled());
-    expect(mockRouter.navigate).toHaveBeenCalledWith('/(tabs)/calendar');
-    expect(callOrder).toEqual(['dismissAll', 'navigate']);
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.reset({
+        index: 0,
+        routes: [{
+          name: '(tabs)',
+          state: {
+            index: 2,
+            routes: [
+              { name: 'index' },
+              { name: 'find' },
+              { name: 'calendar' },
+              { name: 'profile' },
+            ],
+          },
+        }],
+      }),
+    );
   });
 });

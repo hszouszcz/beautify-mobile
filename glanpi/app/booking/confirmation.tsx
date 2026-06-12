@@ -1,5 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useRouter } from 'expo-router';
+import { CommonActions } from '@react-navigation/native';
+import { useNavigationContainerRef } from 'expo-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet } from 'react-native';
@@ -21,7 +22,7 @@ import { useAppTheme } from '@/theme';
  */
 export default function BookingConfirmationScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
+  const navRef = useNavigationContainerRef();
   const { app } = useAppTheme();
   const { draft, reset } = useBookingDraft();
 
@@ -37,8 +38,29 @@ export default function BookingConfirmationScreen() {
 
   const done = () => {
     reset();
-    router.dismissAll();
-    router.navigate('/(tabs)/calendar');
+    // Single atomic reset dispatched to the root nav container ref — the only
+    // reliable way to both close the booking modal and land on the calendar
+    // tab. Two-step approaches (dismissAll + navigate) fail because React
+    // batches the dispatches against the same initial state, so the navigate
+    // fires while the booking inner Stack is still the focused navigator.
+    // Tab indices match app/(tabs)/_layout.tsx: 0=index, 1=find, 2=calendar, 3=profile.
+    navRef.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{
+          name: '(tabs)',
+          state: {
+            index: 2,
+            routes: [
+              { name: 'index' },
+              { name: 'find' },
+              { name: 'calendar' },
+              { name: 'profile' },
+            ],
+          },
+        }],
+      }),
+    );
   };
 
   return (
