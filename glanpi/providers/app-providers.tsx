@@ -1,6 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import { FindFiltersProvider } from './find-filters-provider';
 import { PaperIcon } from './paper-icon';
 import { queryClient } from './query-client';
 
-const paperSettings = { icon: PaperIcon };
+const paperSettings = { icon: PaperIcon, rippleEffectEnabled: true };
 
 /**
  * Single app-wide provider stack (outer → inner):

@@ -36,7 +36,9 @@ export function GPressable({
       onPress={onPress}
       borderless={borderless}
       disabled={disabled}
-      rippleColor={app.colors.backgroundStrong}
+      // rippleColor={app.colors.backgroundStrong}
+      rippleColor="rgba(235, 227, 216, 0.3)"
+      // underlayColor={app.colors.accent}
       style={style}
       testID={testID}
       accessibilityLabel={accessibilityLabel}
